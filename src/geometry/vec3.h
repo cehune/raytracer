@@ -6,10 +6,10 @@
 
 class vec3 {
   public:
-    float x,y,z;
+    float x,y,z, magnitude;
 
-    vec3() : x(0), y(0), z(0) {};
-    vec3(float x0, float y0, float z0) : x(x0), y(y0), z(z0) {};
+    vec3() : x(0), y(0), z(0), magnitude(0) {};
+    vec3(float x0, float y0, float z0) : x(x0), y(y0), z(z0), magnitude(std::sqrt(x * x + y * y + z * z)) {};
 
     float getx() const { return x; }
     float gety() const { return y; }
@@ -40,11 +40,6 @@ class vec3 {
         return *this;
     }
 
-    float magnitude() const {
-        // Returns the length of the vector
-        return std::sqrt(x * x + y * y + z * z);
-    }
-
     float dot(vec3 v) const {
         // Returns dot product
         return x * v.x + y * v.y + z * v.z;
@@ -57,6 +52,9 @@ class vec3 {
             z * v.x - x * v.z,
             x * v.y - y * v.x
         );
+    }
+    vec3 normalize() const {
+        return vec3(x / magnitude, y / magnitude, z / magnitude);
     }
 };
 
@@ -79,6 +77,10 @@ inline vec3 operator-(const vec3& u, const vec3& v) {
 
 inline vec3 operator*(const float t, const vec3& u) {
     return vec3(u.x * t, u.y * t, u.z * t);
+}
+
+inline vec3 operator/(const vec3& u, const float t) {
+    return vec3(u.x / t, u.y / t, u.z / t);
 }
 
 #endif
