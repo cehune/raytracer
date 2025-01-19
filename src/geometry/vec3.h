@@ -40,19 +40,6 @@ class vec3 {
         return *this;
     }
 
-    float dot(vec3 v) const {
-        // Returns dot product
-        return x * v.x + y * v.y + z * v.z;
-    }
-
-    vec3 cross(const vec3& v) const {
-        // Returns cross product
-        return vec3(
-            y * v.z - z * v.y,
-            z * v.x - x * v.z,
-            x * v.y - y * v.x
-        );
-    }
     vec3 normalize() const {
         return vec3(x / magnitude, y / magnitude, z / magnitude);
     }
@@ -83,4 +70,16 @@ inline vec3 operator/(const vec3& u, const float t) {
     return vec3(u.x / t, u.y / t, u.z / t);
 }
 
+double dot(const vec3& u, const vec3& v) {
+    return u.x * v.x + u.y * v.y + u.z * v.z;
+}
+
+vec3 cross(const vec3& u, const vec3& v) {
+    // Returns cross product
+    return vec3(
+        u.y * v.z - u.z * v.y,
+        u.z * v.x - u.x * v.z,
+        u.x * v.y - u.y * v.x
+    );
+}
 #endif

@@ -3,8 +3,19 @@
 #include "./geometry/color.h"
 #include "./geometry/vec3.h"
 
+bool hit_sphere(const vec3& center, double radius, const ray& r) {
+    vec3 dist = center - r.origin();
+    auto a = dot(r.direction(), r.direction());
+    auto b = -2.0 * dot(r.direction(), dist);
+    auto c = dot(dist, dist) - radius*radius;
+    return (b*b - 4.0f*a*c) >= 0;
+}
+
 color ray_color(const ray& r) {
-    vec3 unit_direction = (r.getDirection()).normalize();
+    if (hit_sphere(point3(0,0,-1), 0.5, r)) {
+        return color(0.2, 0.7, 0);
+    }
+    vec3 unit_direction = (r.direction()).normalize();
     auto a = 0.5*(unit_direction.y + 1.0);
     return (1.0-a)*color(1.0, 1.0, 1.0) + a*color(0.5, 0.7, 1.0);
 }
