@@ -6,14 +6,14 @@
 
 class vec3 {
   public:
-    float x,y,z, magnitude;
+    double x,y,z, magnitude;
 
     vec3() : x(0), y(0), z(0), magnitude(0) {};
-    vec3(float x0, float y0, float z0) : x(x0), y(y0), z(z0), magnitude(std::sqrt(x * x + y * y + z * z)) {};
+    vec3(double x0, double y0, double z0) : x(x0), y(y0), z(z0), magnitude(std::sqrt(x * x + y * y + z * z)) {};
 
-    float getx() const { return x; }
-    float gety() const { return y; }
-    float getz() const { return z; }
+    double getx() const { return x; }
+    double gety() const { return y; }
+    double getz() const { return z; }
 
     vec3 operator-() const { return vec3(-x, -y, -z); }
 
@@ -25,7 +25,7 @@ class vec3 {
         return *this;
     }
 
-    vec3& operator*=(float t) {
+    vec3& operator*=(double t) {
         // Scales the vector by a constant
         x *= t;
         y *= t;
@@ -33,16 +33,19 @@ class vec3 {
         return *this;
     }
 
-    vec3& operator/=(float t) {
+    vec3& operator/=(double t) {
         if (t != 0) { // Handle division by zero
             return *this *= 1 / t;
         }
         return *this;
     }
 
-    vec3 normalize() const {
-        return vec3(x / magnitude, y / magnitude, z / magnitude);
+    vec3 normal_of() const {
+        if (magnitude > 0.0f) { return vec3(x / magnitude, y / magnitude, z / magnitude);}
+        return vec3();
     }
+
+
 };
 
 // point3 is just an alias for vec3, but useful for geometric clarity in the code.
@@ -62,11 +65,11 @@ inline vec3 operator-(const vec3& u, const vec3& v) {
     return vec3(u.x - v.x, u.y - v.y, u.z - v.z);
 }
 
-inline vec3 operator*(const float t, const vec3& u) {
+inline vec3 operator*(const double t, const vec3& u) {
     return vec3(u.x * t, u.y * t, u.z * t);
 }
 
-inline vec3 operator/(const vec3& u, const float t) {
+inline vec3 operator/(const vec3& u, const double t) {
     return vec3(u.x / t, u.y / t, u.z / t);
 }
 

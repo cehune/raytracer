@@ -5,7 +5,11 @@
 #include "../vec3.h"
 
 class sphere : public hittable {
-  public:
+private:
+    point3 center;
+    double radius;
+
+public:
     sphere(const point3& center, double radius) : center(center), radius(std::fmax(0,radius)) {}
 
     bool hit(const ray& r, double ray_tmin, double ray_tmax, hit_record& rec) const override {
@@ -34,10 +38,6 @@ class sphere : public hittable {
         // Set the normal, point, and ray direction scalar to hit record
         return true;
     }
-
-  private:
-    point3 center;
-    double radius;
 };
 
 #endif
