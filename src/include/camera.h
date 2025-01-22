@@ -9,6 +9,8 @@ private:
     double aspect_ratio;  // Ratio of image width over height
     double focal_length;
     double viewport_height;
+    double pixel_samples_scale;
+    int aa_samples_per_px;
     int image_width;  // Rendered image width in pixel count
     int image_height;   // Rendered image height
     point3 center;         // Camera center
@@ -20,7 +22,7 @@ private:
     void initialize() {
         image_height = int(image_width / aspect_ratio);
         image_height = (image_height < 1) ? 1 : image_height;
-
+        pixel_samples_scale = 1.0 / aa_samples_per_px;
         // Determine viewport dimensions.
 
         auto viewport_width = viewport_height * (double(image_width)/image_height);
@@ -51,13 +53,13 @@ private:
     }
 
 public:
-    camera(double aspect_rat, int img_width, vec3& c, double focal_len, double viewpt_height):
+    camera(double aspect_rat, int img_width, vec3& c, double focal_len, double viewpt_height, int samples_per_px):
         aspect_ratio(aspect_rat), image_width(img_width), center(c), focal_length(focal_len),
-        viewport_height(viewpt_height) {};
+        viewport_height(viewpt_height), aa_samples_per_px(samples_per_px) {};
     
     camera():
-        aspect_ratio(1.0), image_width(100), center(vec3(0,0,0)), focal_length(1.0),
-        viewport_height(2.0) {};
+        aspect_ratio(1.0), image_width(400), center(vec3(0,0,0)), focal_length(1.0),
+        viewport_height(2.0), aa_samples_per_px(10) {};
 
     void set_aspect_ratio(double ratio) {aspect_ratio = ratio;}
     void set_img_width(int w) {image_width = w;}
@@ -65,22 +67,36 @@ public:
 
     void render(const hittable& world) {
         initialize();
+        int jitter_regions = aa_samples_per_px <= 4 ? 4 : 8; // for anti-aliasing jitter algo
 
         std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
         for (int j = 0; j < image_height; j++) {
             std::clog << "\rScanlines remaining: " << (image_height - j) << ' ' << std::flush;
             for (int i = 0; i < image_width; i++) {
-                auto pixel_center = pixel00_loc + (i * pixel_delta_u) + (j * pixel_delta_v);
-                auto ray_direction = pixel_center - center;
-                ray r(center, ray_direction);
+                vec3 pixel_color = vec3();
 
-                color pixel_color = ray_color(r, world);
-                write_color(std::cout, pixel_color);
+                for (int s = 0; s < aa_samples_per_px; s++) {
+                    ray offset_ray = generate_offset_ray(i, j, s);
+                    pixel_color += ray_color(offset_ray, world);
+                }
+                write_color(std::cout, pixel_samples_scale * pixel_color);
             }
         }
 
         std::clog << "\rDone.                 \n"; 
+    }
+
+    ray generate_offset_ray(int i, int j, int sample_coord) {
+        /* Generate a single offset  
+            sample_coord may be 0,1,2,3
+        */
+        sample_coord = sample_coord % 4;
+        double i_offset = random_double(0, 0.5) * ((sample_coord == 0 || sample_coord == 2) ? 1 : -1);
+        double j_offset = random_double(0, 0.5) * ((sample_coord == 0 || sample_coord == 3) ? 1 : -1);
+
+        auto sample_center = pixel00_loc + ((i + i_offset) * pixel_delta_u) + ((j+j_offset) * pixel_delta_v);
+        return ray(center, sample_center - center);
     }
 };
 
