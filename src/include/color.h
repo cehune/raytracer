@@ -6,11 +6,14 @@
 #include "interval.h"
 using color = vec3;
 // TODO: confirm if alpha channel is required
-
+inline double gamma_correct(double linear_scale, double gamma_val = 2.2) {
+    // gamma val is 2.2 for typical displays
+    return pow(linear_scale, 1.0/2.0);
+}
 void write_color(std::ostream& out, const color& pixel_color) {
-    auto r = pixel_color.x;
-    auto g = pixel_color.y;
-    auto b = pixel_color.z;
+    auto r = gamma_correct(pixel_color.x);
+    auto g = gamma_correct(pixel_color.y);
+    auto b = gamma_correct(pixel_color.z);
 
     // Translate the [0,1] component values to the byte range [0,255].
     static const interval intensity(0.000, 0.999);

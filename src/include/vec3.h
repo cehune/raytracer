@@ -44,8 +44,6 @@ class vec3 {
         if (magnitude > 0.0f) { return vec3(x / magnitude, y / magnitude, z / magnitude);}
         return vec3();
     }
-
-
 };
 
 // point3 is just an alias for vec3, but useful for geometric clarity in the code.
@@ -77,7 +75,7 @@ double dot(const vec3& u, const vec3& v) {
     return u.x * v.x + u.y * v.y + u.z * v.z;
 }
 
-vec3 cross(const vec3& u, const vec3& v) {
+vec3 cross_product(const vec3& u, const vec3& v) {
     // Returns cross product
     return vec3(
         u.y * v.z - u.z * v.y,
@@ -85,4 +83,36 @@ vec3 cross(const vec3& u, const vec3& v) {
         u.x * v.y - u.y * v.x
     );
 }
+
+
+    inline vec3 generate_random_vector() {
+            /* Generate a random vector */
+            return vec3(random_double(), random_double(), random_double());
+        }
+
+    inline vec3 generate_random_vector(double min, double max) {
+            /* 
+            Generate a random vector with constraints
+            Set min and max to [0,1] for a random unit vector
+            */
+            return vec3(random_double(min,max), random_double(min,max), random_double(min,max));
+        }
+
+    inline vec3 random_unit_vector() {
+        while (true) {
+            auto p = generate_random_vector(-1,1);
+            auto lensq = p.magnitude;
+            if (1e-160 < lensq && lensq <= 1)
+                return p / sqrt(lensq);
+        }
+    }
+
+    inline vec3 random_vec_on_hemisphere(const vec3& normal) {
+        vec3 on_unit_sphere = random_unit_vector();
+        if (dot(on_unit_sphere, normal) > 0.0) // In the same hemisphere as the normal
+            return on_unit_sphere;
+        else
+            return -on_unit_sphere;
+    }   
+
 #endif
