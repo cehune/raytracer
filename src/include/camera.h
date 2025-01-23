@@ -73,7 +73,7 @@ public:
     
     camera():
         aspect_ratio(1.0), image_width(400), center(vec3(0,0,0)), focal_length(1.0),
-        viewport_height(2.0), aa_samples_per_px(10), ray_bounces(4) {};
+        viewport_height(2.0), aa_samples_per_px(10), ray_bounces(10) {};
 
     void set_aspect_ratio(double ratio) {aspect_ratio = ratio;}
     void set_img_width(int w) {image_width = w;}
