@@ -48,9 +48,9 @@ class vec3 {
     
     bool near_zero() const {
         // Return true if the vector is close to zero in all dimensions.
-        auto s = 1e-8;
-        return (std::fabs(x) < s) && (std::fabs(y) < s) && (std::fabs(z) < s);
+        return (std::fabs(x) < 1e-8) && (std::fabs(y) < 1e-8) && (std::fabs(z) < 1e-8);
     }
+
 };
 
 // point3 is just an alias for vec3, but useful for geometric clarity in the code.
@@ -95,35 +95,34 @@ vec3 cross_product(const vec3& u, const vec3& v) {
     );
 }
 
-
-    inline vec3 generate_random_vector() {
-            /* Generate a random vector */
-            return vec3(random_double(), random_double(), random_double());
-        }
-
-    inline vec3 generate_random_vector(double min, double max) {
-            /* 
-            Generate a random vector with constraints
-            Set min and max to [0,1] for a random unit vector
-            */
-            return vec3(random_double(min,max), random_double(min,max), random_double(min,max));
-        }
-
-    inline vec3 random_unit_vector() {
-        while (true) {
-            auto p = generate_random_vector(-1,1);
-            auto lensq = p.magnitude;
-            if (1e-160 < lensq && lensq <= 1)
-                return p / sqrt(lensq);
-        }
+inline vec3 generate_random_vector() {
+        /* Generate a random vector */
+        return vec3(random_double(), random_double(), random_double());
     }
 
-    inline vec3 random_vec_on_hemisphere(const vec3& normal) {
-        vec3 on_unit_sphere = random_unit_vector();
-        if (dot(on_unit_sphere, normal) > 0.0) // In the same hemisphere as the normal
-            return on_unit_sphere;
-        else
-            return -on_unit_sphere;
-    }   
+inline vec3 generate_random_vector(double min, double max) {
+        /* 
+        Generate a random vector with constraints
+        Set min and max to [0,1] for a random unit vector
+        */
+        return vec3(random_double(min,max), random_double(min,max), random_double(min,max));
+    }
+
+inline vec3 random_unit_vector() {
+    while (true) {
+        auto p = generate_random_vector(-1,1);
+        auto lensq = p.magnitude;
+        if (1e-160 < lensq && lensq <= 1)
+            return p / sqrt(lensq);
+    }
+}
+
+inline vec3 random_vec_on_hemisphere(const vec3& normal) {
+    vec3 on_unit_sphere = random_unit_vector();
+    if (dot(on_unit_sphere, normal) > 0.0) // In the same hemisphere as the normal
+        return on_unit_sphere;
+    else
+        return -on_unit_sphere;
+}   
 
 #endif
