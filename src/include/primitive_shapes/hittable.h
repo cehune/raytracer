@@ -3,13 +3,13 @@
 
 #include "../ray.h"
 
-class material;
+class bxdf;
 
 class hit_record {
   public:
     vec3 p; // position
     vec3 normal; // surface normal to the position
-    shared_ptr<material> mat;
+    shared_ptr<bxdf> mat;
     double t; // scaling distance
     bool front_face;
 

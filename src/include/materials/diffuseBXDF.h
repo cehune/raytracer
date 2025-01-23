@@ -1,29 +1,32 @@
-#ifndef SPECULAR_H
-#define SPECULAR_H
+/* Diffuse Lambertian Materials */
 
-#include "material.h"
+#ifndef DIFFUSE_BXDF_H
+#define DIFFUSE_BXDF_H
+
+#include "bxdf.h"
 #include "../color.h"
 #include "../ray.h"
+#include "scattering.h"
 
-class specular : public material {
+class diffuseBXDF : public bxdf {
 private:
     color albedo;
     color light_color;
     ray light_direction;
 
 public:
-    specular(const color& albedo) : albedo(albedo), light_color(color(1,1,1)){}
+    diffuseBXDF(const color& albedo) : albedo(albedo), light_color(color(1,1,1)){}
 
     bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const override {
         // TODO: This is not full attenuation formula, scale for light direction too
         attenuation = color(albedo.x * light_color.x, 
             albedo.y * light_color.y, albedo.z * light_color.z);
-        vec3 direction = -2*dot(r_in.direction(), rec.normal) * rec.normal + r_in.direction();
+        vec3 direction = scatter_diffuse(r_in, rec.normal);
         scattered = ray(rec.p, direction);
         return true;
     }
 };
 
-using reflective = specular;
+using lambertian = diffuseBXDF;
 
 #endif
