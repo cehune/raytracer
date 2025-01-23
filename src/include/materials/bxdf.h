@@ -1,11 +1,12 @@
-#ifndef MATERIAL_H
-#define MATERIAL_H
+#ifndef BXDF_H
+#define BXDF_H
 
 #include "../primitive_shapes/hittable.h"
+#include "../color.h"
 
-class material {
+class bxdf {
   public:
-    virtual ~material() = default;
+    virtual ~bxdf() = default;
 
     virtual bool scatter(
         const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered
