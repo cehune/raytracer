@@ -10,6 +10,7 @@ inline double gamma_correct(double linear_scale, double gamma_val = 2.2) {
     // gamma val is 2.2 for typical displays
     return pow(linear_scale, 1.0/2.0);
 }
+
 void write_color(std::ostream& out, const color& pixel_color) {
     auto r = gamma_correct(pixel_color.x);
     auto g = gamma_correct(pixel_color.y);

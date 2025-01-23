@@ -8,8 +8,8 @@
 int main() {
     // World
     hittable_list world;
-    world.add(make_shared<sphere>(vec3(0,0,-1), 0.5));
-    world.add(make_shared<sphere>(vec3(0,-100.5,-1), 100));
+    world.add(make_shared<sphere>(vec3(0,0,-1), 0.5, std::make_shared<diffuse>(color(0.247, 0.416, 0.749))));
+    world.add(make_shared<sphere>(vec3(0,-100.5,-1), 100, std::make_shared<diffuse>(color(0.647, 0.82, 0.639))));
 
     camera cam = camera();
     cam.set_aspect_ratio(16.0 / 9.0);
