@@ -44,6 +44,13 @@ class vec3 {
         if (magnitude > 0.0f) { return vec3(x / magnitude, y / magnitude, z / magnitude);}
         return vec3();
     }
+
+    
+    bool near_zero() const {
+        // Return true if the vector is close to zero in all dimensions.
+        auto s = 1e-8;
+        return (std::fabs(x) < s) && (std::fabs(y) < s) && (std::fabs(z) < s);
+    }
 };
 
 // point3 is just an alias for vec3, but useful for geometric clarity in the code.
@@ -65,6 +72,10 @@ inline vec3 operator-(const vec3& u, const vec3& v) {
 
 inline vec3 operator*(const double t, const vec3& u) {
     return vec3(u.x * t, u.y * t, u.z * t);
+}
+
+inline vec3 operator*(const vec3& u, const vec3& v) {
+    return vec3(u.x * v.x, u.y * v.y, u.z * v.z);
 }
 
 inline vec3 operator/(const vec3& u, const double t) {

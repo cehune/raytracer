@@ -53,8 +53,11 @@ private:
             //I think we need to put this reflective behaviour based on the material property of the element itself
             // This is semi lambertian, where we are basing new ray direction on the normal, but not true
             // Scatters rays towards the normals, but randomly
-            vec3 direction = rec.normal + random_vec_on_hemisphere(rec.normal);
-            return 0.5 * ray_color(ray(rec.p, direction), depth-1, world);
+            ray scattered;
+            color attenuation;
+            if (rec.mat->scatter(r, rec, attenuation, scattered))
+                return attenuation * ray_color(scattered, depth-1, world);
+            return color(0,0,0);
         }
 
         vec3 normal_dir = (r.direction().normal_of());
