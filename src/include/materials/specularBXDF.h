@@ -1,9 +1,12 @@
-#ifndef SPECULAR_H
-#define SPECULAR_H
+/* Directly Reflective Materials */
+
+#ifndef SPECULAR_BXDF_H
+#define SPECULAR_BXDF_H
 
 #include "bxdf.h"
 #include "../color.h"
 #include "../ray.h"
+#include "scattering.h"
 
 class specularBXDF : public bxdf {
 private:
@@ -18,7 +21,7 @@ public:
         // TODO: This is not full attenuation formula, scale for light direction too
         attenuation = color(albedo.x * light_color.x, 
             albedo.y * light_color.y, albedo.z * light_color.z);
-        vec3 direction = -2*dot(r_in.direction(), rec.normal) * rec.normal + r_in.direction();
+        vec3 direction = scatter_reflect(r_in.direction(), rec.normal);
         scattered = ray(rec.p, direction);
         return true;
     }
