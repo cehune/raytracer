@@ -10,11 +10,9 @@ private:
         image_height = int(image_width / aspect_ratio);
         image_height = (image_height < 1) ? 1 : image_height;
         pixel_samples_scale = 1.0 / aa_samples_per_px;
-        focal_length = (center - lookat).magnitude();
-        // Determine viewport dimensions.
         auto theta = degrees_to_radians(fov);
         auto h = std::tan(theta/2);
-        auto viewport_height = 2 * h * focal_length;
+        auto viewport_height = 2 * h * focus_dist;        // Determine viewport dimensions.
         auto viewport_width = viewport_height * (double(image_width)/image_height);
      
         // Calculate the vectors across the horizontal and down the vertical viewport edges.
@@ -24,9 +22,13 @@ private:
 
         pixel_delta_u = viewport_u / image_width;
         pixel_delta_v = viewport_v / image_height; // no change
-        auto viewport_upper_left =
-            center - focal_length * cam_direction - viewport_u/2 - viewport_v/2;
+
+        auto viewport_upper_left = center - (focus_dist * cam_direction) - viewport_u/2 - viewport_v/2;
         pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
+    
+        //auto defocus_radius = focus_dist * std::tan(degrees_to_radians(defocus_angle));
+        //defocus_disk_u = defocus_radius* viewport_u.normal_of();
+        //defocus_disk_v = defocus_radius* viewport_u.normal_of();
     }
 
 
@@ -64,17 +66,16 @@ public:
     int image_width;  // Rendered image width in pixel count
     int image_height;   // Rendered image height
     int ray_bounces; // four by default
+    //double defocus_angle = 0;  // Variation angle of rays through each pixel
+    double focus_dist = 10;    // Distance from camera lookfrom point to plane of perfect focus
     vec3h center;         // Camera center, point
     vec3h lookat;         // Any point the camera is looking toward
     vec3h pixel00_loc;    // Location of pixel 0, 0, point
     vec3h   pixel_delta_u;  // Offset to pixel to the right, direction
     vec3h   pixel_delta_v;  // Offset to pixel below, direction
+    //vec3h   defocus_disk_u;       // Defocus disk horizontal radius
+    //vec3h   defocus_disk_v;       // Defocus disk vertical radius
 
-    camera(double aspect_rat, int img_width, vec3h& c, vec3h& lookat, double fov, double viewpt_height, int samples_per_px,
-        int max_ray_bounces):
-        aspect_ratio(aspect_rat), image_width(img_width), center(c), lookat(lookat), fov(fov),
-        viewport_height(viewpt_height), aa_samples_per_px(samples_per_px), ray_bounces(max_ray_bounces) {};
-    
     camera():
         aspect_ratio(1.0), image_width(400), center(vec3h(0,0,0,1)), lookat(vec3h(0,0,-1,0)), fov(90),
         viewport_height(2.0), aa_samples_per_px(10), ray_bounces(10) {};
@@ -85,8 +86,6 @@ public:
 
     void render(const hittable& world) {
         initialize();
-        int jitter_regions = aa_samples_per_px <= 4 ? 4 : 8; // for anti-aliasing jitter algo
-
         std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
         for (int j = 0; j < image_height; j++) {
@@ -112,10 +111,16 @@ public:
         sample_coord = sample_coord % 4;
         double i_offset = random_double(0, 0.5) * ((sample_coord == 0 || sample_coord == 2) ? 1 : -1);
         double j_offset = random_double(0, 0.5) * ((sample_coord == 0 || sample_coord == 3) ? 1 : -1);
-
+        //auto ray_origin = (defocus_angle <= 0) ? center : defocus_disk_sample();
         auto sample_center = pixel00_loc + ((i + i_offset) * pixel_delta_u) + ((j+j_offset) * pixel_delta_v);
         return ray(center, sample_center - center);
     }
+
+    /*vec3h defocus_disk_sample() const {
+        // Returns a random point in the camera defocus disk.
+        auto p = random_unit_aperture_loc();
+        return center + (p.x * defocus_disk_u) + (p.y * defocus_disk_v);
+    } */
 };
 
 #endif
