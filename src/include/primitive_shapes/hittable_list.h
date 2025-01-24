@@ -5,7 +5,7 @@
 #include <memory>
 #include <vector>
 #include "hittable.h"
-#include "../vec3.h"
+#include "../geometry/vec3.h"
 using std::make_shared;
 using std::shared_ptr;
 
