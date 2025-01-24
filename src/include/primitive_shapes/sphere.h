@@ -9,23 +9,23 @@
 
 class sphere : public hittable {
 private:
-    point3 center;
+    vec3h center;
     double radius;
 
 public:
 std::shared_ptr<bxdf> mat; // Material for the sphere
 
     // Constructor with material
-    sphere(const point3& center, double radius, std::shared_ptr<bxdf> material) 
+    sphere(const vec3h& center, double radius, std::shared_ptr<bxdf> material) 
         : center(center), radius(std::fmax(0, radius)), mat(material) {}
 
     // Constructor without explicit material (default material)
-    sphere(const point3& center, double radius) 
-        : center(center), radius(std::fmax(0, radius)), mat(std::make_shared<diffuseBXDF>(color(0.5, 0.5, 0.5))) {}
+    sphere(const vec3h& center, double radius) 
+        : center(center), radius(std::fmax(0, radius)), mat(std::make_shared<diffuseBXDF>(color(0.5, 0.5, 0.5, 0))) {}
 
 
     bool hit(const ray& r, interval ray_t, hit_record& rec) const {
-        vec3 dist = center - r.origin();
+        vec3h dist = center - r.origin();
         auto a = dot(r.direction(), r.direction());
         auto h = dot(r.direction(), dist);
         auto c = dot(dist, dist) - radius*radius;
