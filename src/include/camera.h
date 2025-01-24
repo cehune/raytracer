@@ -10,7 +10,7 @@ private:
                 image_height = int(image_width / aspect_ratio);
         image_height = (image_height < 1) ? 1 : image_height;
         pixel_samples_scale = 1.0 / aa_samples_per_px;
-        focal_length = (center - lookat).magnitude;
+        focal_length = (center - lookat).magnitude();
         // Determine viewport dimensions.
         auto theta = degrees_to_radians(fov);
         auto h = std::tan(theta/2);
@@ -18,9 +18,9 @@ private:
         auto viewport_width = viewport_height * (double(image_width)/image_height);
      
         // Calculate the vectors across the horizontal and down the vertical viewport edges.
-        vec3 cam_direction = (center - lookat).normal_of();
-        vec3 viewport_u = viewport_width * (cross_product(vec3(0,1,0), cam_direction).normal_of());
-        vec3 viewport_v = -viewport_height * (cross_product(cam_direction, viewport_u).normal_of());
+        vec3h cam_direction = (center - lookat).normal_of();
+        vec3h viewport_u = viewport_width * (cross_product(vec3h(0,1,0,0), cam_direction).normal_of());
+        vec3h viewport_v = -viewport_height * (cross_product(cam_direction, viewport_u).normal_of());
 
         pixel_delta_u = viewport_u / image_width;
         pixel_delta_v = viewport_v / image_height; // no change
@@ -34,7 +34,7 @@ private:
         hit_record rec;
 
         if (depth <= 0) {
-            return color(0,0,0);
+            return color(0,0,0,0);
         }
 
         // set interval start at 0.001 to prevent a ray from bouncing with it's start surface due to float roundoff
@@ -45,13 +45,13 @@ private:
             ray scattered;
             color attenuation;
             if (rec.mat->scatter(r, rec, attenuation, scattered))
-                return attenuation * ray_color(scattered, depth-1, world);
-            return color(0,0,0);
+                return hadamard_product(attenuation, ray_color(scattered, depth-1, world));
+            return color(0,0,0,0);
         }
 
-        vec3 normal_dir = (r.direction().normal_of());
+        vec3h normal_dir = (r.direction().normal_of());
         auto a = 0.5*(normal_dir.y + 1.0);
-        return (1.0-a)*color(1.0, 1.0, 1.0) + a*color(0.5, 0.7, 1.0);
+        return (1.0-a)*color(1.0, 1.0, 1.0, 0) + a*color(0.5, 0.7, 1.0, 0);
     }
 
 public:
@@ -64,19 +64,19 @@ public:
     int image_width;  // Rendered image width in pixel count
     int image_height;   // Rendered image height
     int ray_bounces; // four by default
-    point3 center;         // Camera center
-    point3 lookat;         // Any point the camera is looking toward
-    point3 pixel00_loc;    // Location of pixel 0, 0
-    vec3   pixel_delta_u;  // Offset to pixel to the right
-    vec3   pixel_delta_v;  // Offset to pixel below
+    vec3h center;         // Camera center, point
+    vec3h lookat;         // Any point the camera is looking toward
+    vec3h pixel00_loc;    // Location of pixel 0, 0, point
+    vec3h   pixel_delta_u;  // Offset to pixel to the right, direction
+    vec3h   pixel_delta_v;  // Offset to pixel below, direction
 
-    camera(double aspect_rat, int img_width, vec3& c, vec3& lookat, double fov, double viewpt_height, int samples_per_px,
+    camera(double aspect_rat, int img_width, vec3h& c, vec3h& lookat, double fov, double viewpt_height, int samples_per_px,
         int max_ray_bounces):
         aspect_ratio(aspect_rat), image_width(img_width), center(c), lookat(lookat), fov(fov),
         viewport_height(viewpt_height), aa_samples_per_px(samples_per_px), ray_bounces(max_ray_bounces) {};
     
     camera():
-        aspect_ratio(1.0), image_width(400), center(vec3(0,0,0)), lookat(vec3(0,0,-1)), fov(90),
+        aspect_ratio(1.0), image_width(400), center(vec3h(0,0,0,1)), lookat(vec3h(0,0,-1,0)), fov(90),
         viewport_height(2.0), aa_samples_per_px(10), ray_bounces(10) {};
 
     void set_aspect_ratio(double ratio) {aspect_ratio = ratio;}
@@ -92,7 +92,7 @@ public:
         for (int j = 0; j < image_height; j++) {
             std::clog << "\rScanlines remaining: " << (image_height - j) << ' ' << std::flush;
             for (int i = 0; i < image_width; i++) {
-                vec3 pixel_color = vec3();
+                vec3h pixel_color = vec3h();
 
                 for (int s = 0; s < aa_samples_per_px; s++) {
                     ray offset_ray = generate_offset_ray(i, j, s);

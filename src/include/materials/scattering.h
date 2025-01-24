@@ -8,21 +8,21 @@
 #include "../interval.h"
 #include "../utils.h"
 
-vec3 scatter_diffuse(vec3 normal) {
-    vec3 direction = normal + random_vec_on_hemisphere(normal);
+vec3h scatter_diffuse(vec3h normal) {
+    vec3h direction = normal + random_vec_on_hemisphere(normal);
     // Catch degenerate scatter direction
     if (direction.near_zero())
         direction = normal;
     return direction;
 }
 
-vec3 scatter_reflect(const vec3& r_in_dir, vec3 normal) {
+vec3h scatter_reflect(const vec3h& r_in_dir, vec3h normal) {
     return -2*dot(r_in_dir, normal) * normal + r_in_dir;
 }
 
-vec3 scatter_refract(const vec3& r_in_dir, vec3 normal, double eta) {
-    vec3 r_in_norm = r_in_dir.normal_of();
-    vec3 norm = normal.normal_of();
+vec3h scatter_refract(const vec3h& r_in_dir, vec3h normal, double eta) {
+    vec3h r_in_norm = r_in_dir.normal_of();
+    vec3h norm = normal.normal_of();
 
     double cos_r_in = clamp(dot(-r_in_norm, norm), -1.0, 1.0); // Correct sign for cos(theta)
     bool entering = cos_r_in > 0.0;
@@ -43,9 +43,9 @@ vec3 scatter_refract(const vec3& r_in_dir, vec3 normal, double eta) {
 }
 
 
-double fresnel_dielectric(const vec3& r_in_dir, vec3 normal, double eta) {
-    vec3 r_in_norm = r_in_dir.normal_of();
-    vec3 norm = normal.normal_of();
+double fresnel_dielectric(const vec3h& r_in_dir, vec3h normal, double eta) {
+    vec3h r_in_norm = r_in_dir.normal_of();
+    vec3h norm = normal.normal_of();
 
     double cos_r_in = clamp(dot(r_in_norm, norm), -1.0, 1.0); // Clamps to -1.0, 1.0
     double sin_r_in = sqrt(std::max(0.0, 1.0 - cos_r_in * cos_r_in));
