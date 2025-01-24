@@ -21,7 +21,7 @@ public:
         // TODO: This is not full attenuation formula, scale for light direction too
         attenuation = color(albedo.x * light_color.x, 
             albedo.y * light_color.y, albedo.z * light_color.z);
-        vec3 direction = scatter_diffuse(r_in, rec.normal);
+        vec3 direction = scatter_diffuse(rec.normal);
         scattered = ray(rec.p, direction);
         return true;
     }

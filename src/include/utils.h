@@ -40,4 +40,6 @@ inline double random_double(double min, double max) {
 #include "interval.h"
 #include "materials/diffuseBXDF.h"
 #include "materials/specularBXDF.h"
+#include "materials/refractiveBXDF.h"
+
 #endif
