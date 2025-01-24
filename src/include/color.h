@@ -4,7 +4,7 @@
 #include "geometry/vec3.h"
 #include <iostream>
 #include "interval.h"
-using color = vec3;
+using color = vec3h;
 // TODO: confirm if alpha channel is required
 inline double gamma_correct(double linear_scale, double gamma_val = 2.2) {
     // gamma val is 2.2 for typical displays

@@ -7,15 +7,15 @@ class bxdf;
 
 class hit_record {
   public:
-    vec3 p; // position
-    vec3 normal; // surface normal to the position
+    vec3h p; // position
+    vec3h normal; // surface normal to the position
     shared_ptr<bxdf> mat;
     double t; // scaling distance
     bool front_face;
 
     /* Setup so normals always point outward from the surface. Do this at geometry time
     because we do not have much geometry types right now. Focus on material types*/
-    void set_face_normal(const ray& r, const vec3& outward_normal) {
+    void set_face_normal(const ray& r, const vec3h& outward_normal) {
       front_face = dot(r.direction(), outward_normal) < 0; 
       normal = front_face ? outward_normal: -outward_normal;
     }
