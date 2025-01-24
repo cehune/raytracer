@@ -127,4 +127,14 @@ inline vec3h random_vec_on_hemisphere(const vec3h& normal) {
         return -on_unit_sphere;
 }   
 
+inline vec3h random_unit_aperture_loc() {
+    double r = sqrt(random_double(0.0, 1.0)); 
+    double theta = random_double(0.0, 2.0 * pi);  
+    double x = r * cos(theta);
+    double y = r * sin(theta);
+
+    return vec3h(x, y, 0, 1);
+}
+
+
 #endif
