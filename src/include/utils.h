@@ -36,7 +36,7 @@ inline double random_double(double min, double max) {
 // Common Headers
 #include "color.h"
 #include "ray.h"
-#include "vec3.h"
+#include "geometry/vec3.h"
 #include "interval.h"
 #include "materials/diffuseBXDF.h"
 #include "materials/specularBXDF.h"

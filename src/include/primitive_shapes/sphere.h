@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include "./hittable.h"
-#include "../vec3.h"
+#include "../geometry/vec3.h"
 #include "../materials/bxdf.h"
 #include "../materials/diffuseBXDF.h"
 
