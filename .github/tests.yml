@@ -1,0 +1,32 @@
+name: Run Tests
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    
+    - name: Set up C++ environment
+      uses: actions/setup-cpp@v1
+      with:
+        compiler: 'gcc'  # Or 'clang', based on what you're using
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake build-essential
+    
+    - name: Create build directory
+      run: mkdir build && cd build
+    
+    - name: Build the project
+      run: |
+        cmake ..
+        make tests  # This should build your tests
+    
+    - name: Run the tests
+      run: ./build/Debug/tests.exe  # Or the appropriate path to your compiled test executable
