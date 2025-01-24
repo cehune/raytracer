@@ -6,41 +6,30 @@
 
 class camera {
 private:
-    double aspect_ratio;  // Ratio of image width over height
-    double focal_length;
-    double viewport_height;
-    double pixel_samples_scale;
-    int aa_samples_per_px;
-    int image_width;  // Rendered image width in pixel count
-    int image_height;   // Rendered image height
-    int ray_bounces; // four by default
-    point3 center;         // Camera center
-    point3 pixel00_loc;    // Location of pixel 0, 0
-    vec3   pixel_delta_u;  // Offset to pixel to the right
-    vec3   pixel_delta_v;  // Offset to pixel below
-
-
     void initialize() {
         image_height = int(image_width / aspect_ratio);
         image_height = (image_height < 1) ? 1 : image_height;
         pixel_samples_scale = 1.0 / aa_samples_per_px;
+        focal_length = (center - lookat).magnitude;
         // Determine viewport dimensions.
-
+        auto theta = degrees_to_radians(fov);
+        auto h = std::tan(theta/2);
+        auto viewport_height = 2 * h * focal_length;
         auto viewport_width = viewport_height * (double(image_width)/image_height);
-
+     
         // Calculate the vectors across the horizontal and down the vertical viewport edges.
-        auto viewport_u = vec3(viewport_width, 0, 0);
-        auto viewport_v = vec3(0, -viewport_height, 0);
+        vec3 cam_direction = (center - lookat).normal_of();
+        vec3 viewport_u = viewport_width * (cross_product(vec3(0,1,0), cam_direction).normal_of());
+        vec3 viewport_v = -viewport_height * (cross_product(cam_direction, viewport_u).normal_of());
 
-        // Calculate the horizontal and vertical delta vectors from pixel to pixel.
         pixel_delta_u = viewport_u / image_width;
-        pixel_delta_v = viewport_v / image_height;
-
-        // Calculate the location of the upper left pixel.
+        pixel_delta_v = viewport_v / image_height; // no change
         auto viewport_upper_left =
-            center - vec3(0, 0, focal_length) - viewport_u/2 - viewport_v/2;
+            center - focal_length * cam_direction - viewport_u/2 - viewport_v/2;
         pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
     }
+
+
     color ray_color(const ray& r, int depth, const hittable& world) const {
         hit_record rec;
 
@@ -66,13 +55,28 @@ private:
     }
 
 public:
-    camera(double aspect_rat, int img_width, vec3& c, double focal_len, double viewpt_height, int samples_per_px,
+    double aspect_ratio;  // Ratio of image width over height
+    double focal_length;
+    double viewport_height;
+    double pixel_samples_scale;
+    double fov;
+    int aa_samples_per_px;
+    int image_width;  // Rendered image width in pixel count
+    int image_height;   // Rendered image height
+    int ray_bounces; // four by default
+    point3 center;         // Camera center
+    point3 lookat;         // Any point the camera is looking toward
+    point3 pixel00_loc;    // Location of pixel 0, 0
+    vec3   pixel_delta_u;  // Offset to pixel to the right
+    vec3   pixel_delta_v;  // Offset to pixel below
+
+    camera(double aspect_rat, int img_width, vec3& c, vec3& lookat, double fov, double viewpt_height, int samples_per_px,
         int max_ray_bounces):
-        aspect_ratio(aspect_rat), image_width(img_width), center(c), focal_length(focal_len),
+        aspect_ratio(aspect_rat), image_width(img_width), center(c), lookat(lookat), fov(fov),
         viewport_height(viewpt_height), aa_samples_per_px(samples_per_px), ray_bounces(max_ray_bounces) {};
     
     camera():
-        aspect_ratio(1.0), image_width(400), center(vec3(0,0,0)), focal_length(1.0),
+        aspect_ratio(1.0), image_width(400), center(vec3(0,0,0)), lookat(vec3(0,0,-1)), fov(90),
         viewport_height(2.0), aa_samples_per_px(10), ray_bounces(10) {};
 
     void set_aspect_ratio(double ratio) {aspect_ratio = ratio;}
