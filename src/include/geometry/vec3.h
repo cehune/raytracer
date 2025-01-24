@@ -9,6 +9,7 @@ if w is 1, then the object is a point. If w is 0, it is a vector direction.
 
 #include <cmath>
 #include <iostream>
+#include "../utils.h"
 
 class vec3h {
   public:
@@ -80,7 +81,18 @@ inline vec3h operator/(const vec3h& u, const double t) {
 }
 
 double dot(const vec3h& u, const vec3h& v) {
+    // Inner product with two vectors
     return u.x * v.x + u.y * v.y + u.z * v.z;
+}
+
+double dot(double ux, double uy, double uz, double vx, double vy, double vz) {
+    // Inner product with the xyz values of two vectors
+    return ux * vx + uy * vy + uz * vz;
+}
+
+double dot(double ux, double uy, double uz, double uw, double vx, double vy, double vz, double vw) {
+    // Inner product with the xyz values of two vectors
+    return ux * vx + uy * vy + uz * vz + uw * vw;
 }
 
 vec3h cross_product(const vec3h& u, const vec3h& v) {
@@ -98,9 +110,9 @@ inline vec3h hadamard_product(const vec3h& u, const vec3h& v) {
 }
 
 inline vec3h generate_random_vector() {
-        /* Generate a random vector */
-        return vec3h(random_double(), random_double(), random_double(), 0);
-    }
+    /* Generate a random vector */
+    return vec3h(random_double(), random_double(), random_double(), 0);
+}
 
 inline vec3h generate_random_vector(double min, double max) {
         /* 
