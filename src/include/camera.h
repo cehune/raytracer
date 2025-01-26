@@ -3,6 +3,8 @@
 
 #include "primitive_shapes/hittable.h"
 #include "utils.h"
+#include "geometry/matrix.h"
+#include "geometry/transform.h"
 
 class camera {
 private:
@@ -10,6 +12,7 @@ private:
         image_height = int(image_width / aspect_ratio);
         image_height = (image_height < 1) ? 1 : image_height;
         pixel_samples_scale = 1.0 / aa_samples_per_px;
+        tilt_angle = degrees_to_radians(tilt_angle);
         auto theta = degrees_to_radians(fov);
         auto h = std::tan(theta/2);
         auto viewport_height = 2 * h * focus_dist;        // Determine viewport dimensions.
@@ -23,6 +26,7 @@ private:
         pixel_delta_u = viewport_u / image_width;
         pixel_delta_v = viewport_v / image_height; // no change
 
+        apply_camera_rotation(cam_direction, pixel_delta_u, pixel_delta_v, tilt_angle);
         auto viewport_upper_left = center - (focus_dist * cam_direction) - viewport_u/2 - viewport_v/2;
         pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
     
@@ -66,6 +70,7 @@ public:
     int image_width;  // Rendered image width in pixel count
     int image_height;   // Rendered image height
     int ray_bounces; // four by default
+    double tilt_angle;
     //double defocus_angle = 0;  // Variation angle of rays through each pixel
     double focus_dist = 10;    // Distance from camera lookfrom point to plane of perfect focus
     vec3h center;         // Camera center, point
@@ -78,7 +83,7 @@ public:
 
     camera():
         aspect_ratio(1.0), image_width(400), center(vec3h(0,0,0,1)), lookat(vec3h(0,0,-1,0)), fov(90),
-        viewport_height(2.0), aa_samples_per_px(10), ray_bounces(10) {};
+        viewport_height(2.0), aa_samples_per_px(10), ray_bounces(10), tilt_angle(0.0) {};
 
     void set_aspect_ratio(double ratio) {aspect_ratio = ratio;}
     void set_img_width(int w) {image_width = w;}
@@ -121,6 +126,18 @@ public:
         auto p = random_unit_aperture_loc();
         return center + (p.x * defocus_disk_u) + (p.y * defocus_disk_v);
     } */
+
+    void apply_camera_rotation(vec3h& axis, vec3h &delta_u, vec3h &delta_v, double angle) {
+        /*
+        Util function to rotate the camera pixel_delta values by some axis about some angle
+        The angle should be the direction vector from the camera center to the lookat vector.
+        Expects angle to be in radians
+        */
+        transform rotation = rotateAxis(axis, angle);
+        //std::cout << "war" << rotation.m[0][0] << std::endl;
+        delta_u = apply_transform(rotation.m, delta_u);
+        delta_v = apply_transform(rotation.m, delta_v);
+    }
 };
 
 #endif
