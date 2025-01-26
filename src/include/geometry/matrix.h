@@ -39,6 +39,22 @@ public:
         }
     }
 
+    squareMatrix(const squareMatrix& other) {
+        for (int i = 0; i < N; ++i) {
+            for (int j = 0; j < N; ++j) {
+                matrix[i][j] = other.matrix[i][j];
+            }
+        }
+    }
+
+    squareMatrix operator=(squareMatrix& m) {
+        for (int i = 0; i < N; ++i) {
+            for (int j = 0; j < N; ++j) {
+                matrix[i][j] = m.matrix[i][j];
+            }
+        }
+    }
+
     squareMatrix operator+(squareMatrix& m) {
         squareMatrix ret = *this;
         for (int i = 0; i < N; ++i){
@@ -162,5 +178,15 @@ inline squareMatrix<4> operator*(const squareMatrix<4> &m1,
                 m2[2][j], m1[i][3], m2[3][j]);
     return r;
 }
+
+inline vec3h operator*(const vec3h &u, const squareMatrix<4> &m) {
+    vec3h v;
+    v.x = m[0][0] * u.x + m[0][1] * u.y + m[0][2] * u.z + m[0][3] * u.w;
+    v.y = m[1][0] * u.x + m[1][1] * u.y + m[1][2] * u.z + m[1][3] * u.w;
+    v.z = m[2][0] * u.x + m[2][1] * u.y + m[2][2] * u.z + m[2][3] * u.w;
+    v.w = m[3][0] * u.x + m[3][1] * u.y + m[3][2] * u.z + m[3][3] * u.w;
+    return v;
+}
+
 
 #endif
