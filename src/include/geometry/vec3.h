@@ -148,5 +148,20 @@ inline vec3h random_unit_aperture_loc() {
     return vec3h(x, y, 0, 1);
 }
 
+vec3h vec_max(const vec3h& u, const vec3h& v) {
+    /*
+    Computes the max vector of two given vectors | if u is (1,1,3) and 
+    v is (2,2,1) then the max is (2,2,3)
+    */
+    return vec3h(std::max(u.x, v.x), std::max(u.y, v.y), std::max(u.z, v.z), 1);
+}
+
+vec3h vec_min(const vec3h& u, const vec3h& v) {
+    /*
+    Computes the max vector of two given vectors | if u is (1,1,3) and 
+    v is (2,2,1) then the max is (2,2,3)
+    */
+    return vec3h(std::min(u.x, v.x), std::min(u.y, v.y), std::min(u.z, v.z), 1);
+}
 
 #endif
