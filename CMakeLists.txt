@@ -7,4 +7,5 @@ include_directories(src/include)
 
 add_executable(raytracer src/Source.cpp)
 
-add_executable(tests src/tests/test_transform.cpp)
+add_executable(tests src/tests/run_tests.cpp)
+
