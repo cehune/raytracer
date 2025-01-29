@@ -58,6 +58,58 @@ struct Bounds3f {
         else if (d.y > d.z)         return 1;
         else                        return 2;
     }
+
+    bool intersect(const ray &r, interval ray_t) const {
+        /*
+        A modified version of Smit's algorithm by Amy William et al. 
+        An Efficient and Robust Ray–Box Intersection Algorithm 
+        */
+        double tmin, tmax, tymin, tymax, tzmin, tzmax;
+
+        // Compare AABB x coords to direction x coords to find the t
+        // value of when the direction intersects the AABB coords
+        if (r.sign_x()) { 
+            tmin = (pmin.x - r.origin().x) * r.inv_direction().x;
+            tmax = (pmax.x - r.origin().x) * r.inv_direction().x;
+        }
+        else {
+            tmin = (pmax.x - r.origin().x) * r.inv_direction().x;
+            tmax = (pmin.x - r.origin().x) * r.inv_direction().x;
+        }
+
+        // Repeat for y
+        if (r.sign_y()) {
+            tymin = (pmin.y - r.origin().y) * r.inv_direction().y;
+            tymax = (pmax.y - r.origin().y) * r.inv_direction().y;
+        }
+        else {
+            tymin = (pmax.y - r.origin().y) * r.inv_direction().y;
+            tymax = (pmin.y - r.origin().y) * r.inv_direction().y;
+        }
+
+        // Check if theres an intersection with x-y plane
+        if ( (tmin > tymax) || (tymin > tmax) ) return false;
+        if (tymin > tmin) tmin = tymin;
+        if (tymax < tmax) tmax = tymax;
+        
+        // Check z axis
+        if (r.sign_z()) {
+            tzmin = (pmin.z - r.origin().z) * r.inv_direction().z;
+            tzmax = (pmax.z - r.origin().z) * r.inv_direction().z;
+        }
+        else {
+            tzmin = (pmax.z - r.origin().z) * r.inv_direction().z;
+            tzmax = (pmin.z - r.origin().z) * r.inv_direction().z;
+        }
+
+        // Check if intersection between x-y and z
+        if ( (tmin > tzmax) || (tzmin > tmax) ) return false;
+        if (tzmin > tmin)tmin = tzmin;
+        if (tzmax < tmax)tmax = tzmax;
+
+        // Return true if we are in interval bounds.
+        return ((tmin < ray_t.max) && (tmax > ray_t.min));
+    }
 };
 
 Bounds3f bounds_intersection(const Bounds3f& b1, const Bounds3f& b2) {

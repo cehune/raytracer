@@ -44,7 +44,7 @@ private:
         }
 
         // set interval start at 0.001 to prevent a ray from bouncing with it's start surface due to float roundoff
-        if (world.hit(r, interval(0.001, infinity), rec)) {
+        if (world.intersect(r, interval(0.001, infinity), rec)) {
             //I think we need to put this reflective behaviour based on the material property of the element itself
             // This is semi lambertian, where we are basing new ray direction on the normal, but not true
             // Scatters rays towards the normals, but randomly
