@@ -24,7 +24,7 @@ std::shared_ptr<bxdf> mat; // Material for the sphere
         : center(center), radius(std::fmax(0, radius)), mat(std::make_shared<diffuseBXDF>(color(0.5, 0.5, 0.5, 0))) {}
 
 
-    bool hit(const ray& r, interval ray_t, hit_record& rec) const {
+    bool intersect(const ray& r, interval ray_t, hit_record& rec) const {
         vec3h dist = center - r.origin();
         auto a = dot(r.direction(), r.direction());
         auto h = dot(r.direction(), dist);
