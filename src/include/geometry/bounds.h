@@ -64,27 +64,27 @@ struct Bounds3f {
         A modified version of Smit's algorithm by Amy William et al. 
         An Efficient and Robust Ray–Box Intersection Algorithm 
         */
-        float tmin, tmax, tymin, tymax, tzmin, tzmax;
+        double tmin, tmax, tymin, tymax, tzmin, tzmax;
 
         // Compare AABB x coords to direction x coords to find the t
         // value of when the direction intersects the AABB coords
-        if (r.signx) { 
-            tmin = (pmin.x - r.orig.x) * r.inv_dir.x;
-            tmax = (pmax.x - r.orig.x) * r.inv_dir.x;
+        if (r.sign_x()) { 
+            tmin = (pmin.x - r.origin().x) * r.inv_direction().x;
+            tmax = (pmax.x - r.origin().x) * r.inv_direction().x;
         }
         else {
-            tmin = (pmax.x - r.orig.x) * r.inv_dir.x;
-            tmax = (pmin.x - r.orig.x) * r.inv_dir.x;
+            tmin = (pmax.x - r.origin().x) * r.inv_direction().x;
+            tmax = (pmin.x - r.origin().x) * r.inv_direction().x;
         }
 
         // Repeat for y
-        if (r.signy) {
-            tymin = (pmin.y - r.orig.y) * r.inv_dir.y;
-            tymax = (pmax.y - r.orig.y) * r.inv_dir.y;
+        if (r.sign_y()) {
+            tymin = (pmin.y - r.origin().y) * r.inv_direction().y;
+            tymax = (pmax.y - r.origin().y) * r.inv_direction().y;
         }
         else {
-            tymin = (pmax.y - r.orig.y) * r.inv_dir.y;
-            tymax = (pmin.y - r.orig.y) * r.inv_dir.y;
+            tymin = (pmax.y - r.origin().y) * r.inv_direction().y;
+            tymax = (pmin.y - r.origin().y) * r.inv_direction().y;
         }
 
         // Check if theres an intersection with x-y plane
@@ -93,13 +93,13 @@ struct Bounds3f {
         if (tymax < tmax) tmax = tymax;
         
         // Check z axis
-        if (r.signz) {
-            tzmin = (pmin.z - r.orig.z) * r.inv_dir.z;
-            tzmax = (pmax.z - r.orig.z) * r.inv_dir.z;
+        if (r.sign_z()) {
+            tzmin = (pmin.z - r.origin().z) * r.inv_direction().z;
+            tzmax = (pmax.z - r.origin().z) * r.inv_direction().z;
         }
         else {
-            tzmin = (pmax.z - r.orig.z) * r.inv_dir.z;
-            tzmax = (pmin.z - r.orig.z) * r.inv_dir.z;
+            tzmin = (pmax.z - r.origin().z) * r.inv_direction().z;
+            tzmax = (pmin.z - r.origin().z) * r.inv_direction().z;
         }
 
         // Check if intersection between x-y and z
