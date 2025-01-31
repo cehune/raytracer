@@ -21,6 +21,13 @@ class vec3h {
     double magnitude() const {
         return std::sqrt(x * x + y * y + z * z);
     }
+
+    double operator[](int axis) const {
+        if (axis == 0) return x;
+        if (axis == 1) return y;
+        if (axis == 2) return z;
+        throw std::out_of_range("Invalid axis: must be 0, 1, or 2.");
+    }
     vec3h operator-() const { return vec3h(-x, -y, -z, w); }
     vec3h& operator+=(const vec3h& v) {
         // Adds a vector onto the current vector
@@ -43,6 +50,19 @@ class vec3h {
             return *this *= 1 / t;
         }
         return *this;
+    }
+
+    bool operator==(vec3h&u) {
+        if (x == u.x && y == u.y && z == u.z) {
+            return true;
+        }
+        return false;
+    }
+    bool operator!=(vec3h&u) {
+        if (x != u.x || y != u.y || z != u.z) {
+            return true;
+        }
+        return false;
     }
 
     vec3h normal_of() const {

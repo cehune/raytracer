@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include "../include/geometry/bounds.h"
+#include "../include/primitive_shapes/sphere.h"
 
 // Mock vec3h for testing purposes
 
@@ -122,6 +123,12 @@ void test_bounds_overlaps() {
     std::cout << "test_bounds_overlaps passed!\n";
 }
 
+void test_sphere_bounds() {
+    sphere s(vec3h(5.0, 0, 0.0, 1), 1.0);
+    assert(s.bounds().pmin == vec3h(4.0, -1.0, -1.0, 1));
+    std::cout << "test_bounds_overlaps passed!\n";
+}
+
 int run_test_bounds() {
     std::cout << "\n Starting tests for /geometry/bounds\n\n";
 
@@ -136,6 +143,7 @@ int run_test_bounds() {
     test_max_dimen();
     test_bounds_intersection();
     test_bounds_overlaps();
+    test_sphere_bounds();
     return 0;
 }
 

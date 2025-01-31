@@ -2,6 +2,7 @@
 #define HITTABLE_H
 
 #include "../ray.h"
+#include "geometry/bounds.h"
 
 class bxdf;
 
@@ -24,7 +25,7 @@ class hit_record {
 class hittable {
   public:
     virtual ~hittable() = default;
-
+    virtual Bounds3f bounds() const = 0;
     virtual bool intersect(const ray& r, interval ray_t, hit_record& rec) const = 0;
 };
 
