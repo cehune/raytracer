@@ -52,7 +52,7 @@ class vec3h {
         return *this;
     }
 
-    bool operator==(vec3h&u) {
+    bool operator==(const vec3h&u) {
         if (x == u.x && y == u.y && z == u.z) {
             return true;
         }
