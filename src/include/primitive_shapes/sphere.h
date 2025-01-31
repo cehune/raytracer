@@ -51,6 +51,12 @@ std::shared_ptr<bxdf> mat; // Material for the sphere
         // Set the normal, point, and ray direction scalar to hit record
         return true;
     }   
+
+    Bounds3f bounds() const { 
+        vec3h pmin = center - vec3h(radius, radius, radius, 1);  // Center minus radius
+        vec3h pmax = center + vec3h(radius, radius, radius, 1);  // Center plus radius
+        return Bounds3f(pmin, pmax);  //
+    }
 };
 
 #endif

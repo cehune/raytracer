@@ -37,6 +37,7 @@ class hittable_list : public hittable {
 
         return hit_anything;
     }
+    Bounds3f bounds() const override { return Bounds3f();} // TODO this
 };
 
 #endif

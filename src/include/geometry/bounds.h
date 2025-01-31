@@ -40,6 +40,11 @@ struct Bounds3f {
         return 2 * (d.x * d.y + d.x * d.z + d.y * d.z);
     }
 
+    double inverse_surface_area() const {
+        // SAH cost function divides by surface area. might as well just inverse here and multiply
+        return 1.0 / (surface_area() > 1e-6f ? surface_area() : 1.0e-6);
+    }
+
     double volume() const {
         vec3h d = diagonal();
         return d.x * d.y * d.z;
@@ -57,6 +62,14 @@ struct Bounds3f {
         if (d.x > d.y && d.x > d.z) return 0;
         else if (d.y > d.z)         return 1;
         else                        return 2;
+    }
+
+    double axis_length(int axis) const {
+        vec3h p_axis = pmax - pmin;
+        if (axis == 0) return p_axis.x;
+        if (axis == 1) return p_axis.y;
+        if (axis == 2) return p_axis.z;
+        throw std::out_of_range("Invalid axis: must be 0, 1, or 2.");
     }
 
     bool intersect(const ray &r, interval ray_t) const {
@@ -130,5 +143,12 @@ Bounds3f Union(const Bounds3f &b, vec3h& p) {
     ret.pmax = vec_max(b.pmax, p);
     return ret;
 }
+
+Bounds3f Union(const Bounds3f &b1, const Bounds3f& b2) {
+    vec3h newMin = vec_min(b1.pmin, b2.pmin);
+    vec3h newMax = vec_max(b1.pmax, b2.pmax);
+    return Bounds3f(newMin, newMax);
+}
+
 
 #endif

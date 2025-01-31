@@ -6,10 +6,12 @@
 #include "test_transform.h"
 #include "test_math.h"
 
+#include "test_bvh.h"
 
 
 int main() {
     run_test_bounds();
     run_test_transform();
     run_test_math();
+    run_test_bvh();
 }
