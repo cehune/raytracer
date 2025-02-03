@@ -38,7 +38,7 @@ private:
 
     color ray_color(const ray& r, int depth, const hittable_list& world, BVHTreeNode* head) const {
         hit_record rec;
-
+        std::cout << "wahh\n";
         if (depth <= 0) {
             return color(0,0,0,0);
         }
@@ -97,7 +97,6 @@ public:
             std::clog << "\rScanlines remaining: " << (image_height - j) << ' ' << std::flush;
             for (int i = 0; i < image_width; i++) {
                 vec3h pixel_color = vec3h();
-
                 for (int s = 0; s < aa_samples_per_px; s++) {
                     ray offset_ray = generate_offset_ray(i, j, s);
                     pixel_color += ray_color(offset_ray, ray_bounces, world, head);

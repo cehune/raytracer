@@ -45,7 +45,9 @@ public:
         root->bounds = rootBoundingBox;
         // Find largest axis to monitor
         int largest_axis = rootBoundingBox.max_dimen();
-
+        std::sort(bvhPrimitives.begin(), bvhPrimitives.end(), [largest_axis](const BVHPrimitive& a, const BVHPrimitive& b) {
+            return a.Centroid()[largest_axis] < b.Centroid()[largest_axis];
+        });
         // Generate buckets
         const int num_buckets = 12;
         double bucket_width = rootBoundingBox.axis_length(largest_axis) / num_buckets;

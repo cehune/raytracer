@@ -14,7 +14,7 @@ class hittable_list{
 private:
 public:
     std::vector<shared_ptr<hittable>> objects;
-
+    mutable int comparisons = 0;
     hittable_list() {}
     hittable_list(shared_ptr<hittable> object) { add(object); }
 
@@ -28,12 +28,14 @@ public:
         hit_record left_rec, right_rec;
         bool hit_anything = false;
         auto closest_so_far = ray_t.max;
-
+        comparisons += 1;
         // If there is an intersect with the head bounds (overall structure containing all bounds)
         if (head->bounds.intersect(r, ray_t)) {
             // If it is a leaf, loop through all prims at node
+            comparisons +=1;
             if (head->isLeaf()) {
                 for (const BVHPrimitive& prim : head->prims) {
+                    comparisons += 1;
                     if (prim.object->intersect(r, interval(ray_t.min, closest_so_far), left_rec)) {
                         // Records the closest hit object
                         hit_anything = true;

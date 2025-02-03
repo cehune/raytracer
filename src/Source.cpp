@@ -6,6 +6,18 @@
 #include "include/camera.h"
 #include "include/acceleration/bvh_aggregate.h"
 
+// Function to compute the height of the tree
+int getHeight(BVHTreeNode* node) {
+    if (node == nullptr) {
+        return 0;
+    }
+
+    int leftHeight = getHeight(node->left.get());  // Use .get() to access the raw pointer
+    int rightHeight = getHeight(node->right.get());
+
+    return std::max(leftHeight, rightHeight) + 1;
+}
+
 int main() {
     std::vector<shared_ptr<hittable>> objects;
 
@@ -69,14 +81,17 @@ int main() {
     camera cam;
 
     cam.aspect_ratio      = 16.0 / 9.0;
-    cam.image_width       = 800;
-    cam.aa_samples_per_px = 10;
-    cam.ray_bounces         = 20;
+    cam.image_width       = 1;
+    cam.aa_samples_per_px = 1;
+    cam.ray_bounces         = 1;
 
     cam.fov     = 20;
     cam.center = vec3h(13,2,3, 1);
     cam.lookat   = vec3h(0,0,0, 1);
-
+    cam.tilt_angle = 15.0;
     cam.focus_dist    = 10.0;
     cam.render(world, bvh.get_head());
+    std::cout << objects.size() << std::endl;
+    std::cout << "height" << getHeight(bvh.get_head()) << std::endl;
+    std::cout << world.comparisons << " comparisons" << std::endl;
 }
