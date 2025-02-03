@@ -21,6 +21,7 @@ public:
         for (size_t i = 0; i < objs.size(); ++i) {
             bvhPrimitives[i] = BVHPrimitive(i, (*objs[i]).bounds(), objs[i]); // pointer !!!!!!!!!
         }
+        
         // Move ownership of the result from sah_recursive to 'head'
         if (objs.size() != 0) {
             head = sah_recursive(bvhPrimitives);
@@ -58,22 +59,16 @@ public:
             // Expand the bound's of the grouping in the bucket
             buckets[bucket_number].bounds = Union(buckets[bucket_number].bounds, bvh_prim.bounds);
         }
-        std::vector <BVHBucket> clamped_buckets;
-        for (int i = 0; i < num_buckets; i++) {
-            if (buckets[i].num_prims > 0) {
-                clamped_buckets.push_back(buckets[i]);
-            }
-        }
 
         double num_prims_left = 0;
-        int num_splits = static_cast<int>(clamped_buckets.size()) - 1;
+        int num_splits = num_buckets - 1;
         std::vector<double> costs(num_splits); // Initialize costs
 
         // Accumulate costs at each split from the left side
         Bounds3f boundBelow;
         for (int i = 0; i < num_splits; ++i) {
-            boundBelow = Union(boundBelow, clamped_buckets[i].bounds);
-            num_prims_left += clamped_buckets[i].num_prims;
+            boundBelow = Union(boundBelow, buckets[i].bounds);
+            num_prims_left += buckets[i].num_prims;
             costs[i] += num_prims_left * boundBelow.surface_area();
         }
 
@@ -81,8 +76,8 @@ public:
         int num_prims_right = 0;
         Bounds3f boundAbove;
         for (int i = num_splits; i >= 1; --i) {
-            boundAbove = Union(boundAbove, clamped_buckets[i].bounds);
-            num_prims_right += clamped_buckets[i].num_prims;
+            boundAbove = Union(boundAbove, buckets[i].bounds);
+            num_prims_right += buckets[i].num_prims;
             costs[i - 1] += num_prims_right * boundAbove.surface_area();
         }
 

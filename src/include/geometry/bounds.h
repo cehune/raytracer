@@ -8,7 +8,6 @@ struct Bounds3f {
     vec3h pmin, pmax;
 
     Bounds3f() : pmin(vec3h{infinity, infinity, infinity, 1}), pmax(vec3h{-1.0 * infinity, -1.0 * infinity, -1.0 * infinity, 1}) {}
-    //Bounds3f() : pmin(vec3h{0.0, 0.0, 0.0, 1}), pmax(vec3h{0.0, 0.0, 0.0, 1}) {}
 
     // Constructor to create bounds from min and max points
     Bounds3f(const vec3h& p1, const vec3h& p2){
@@ -131,6 +130,13 @@ Bounds3f Union(const Bounds3f &b, vec3h& p) {
     Bounds3f ret;
     ret.pmin = vec_min(b.pmin, p);
     ret.pmax = vec_max(b.pmax, p);
+    ret.pmin.x *= 2.0;
+
+    ret.pmin.y *= 2.0;
+    ret.pmin.z *= 2.0;
+    ret.pmax.x *= 2.0;
+    ret.pmax.y *= 2.0;
+    ret.pmax.z *= 2.0;
     return ret;
 }
 

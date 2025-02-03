@@ -9,8 +9,8 @@
 
 void test_default_constructor() {
     Bounds3f b;
-    assert(b.pmin.x == 0 && b.pmin.y == 0 && b.pmin.z == 0);
-    assert(b.pmax.x == 0 && b.pmax.y == 0 && b.pmax.z == 0);
+    assert(b.pmin.x == infinity && b.pmin.y == infinity && b.pmin.z == infinity);
+    assert(b.pmax.x == -infinity && b.pmax.y == -infinity && b.pmax.z == -infinity);
     std::cout << "test_default_constructor passed!\n";
 }
 
