@@ -38,7 +38,7 @@ private:
 
     color ray_color(const ray& r, int depth, const hittable_list& world, BVHTreeNode* head) const {
         hit_record rec;
-        std::cout << "wahh\n";
+        //std::cout << "wahh\n";
         if (depth <= 0) {
             return color(0,0,0,0);
         }

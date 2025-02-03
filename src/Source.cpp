@@ -81,9 +81,9 @@ int main() {
     camera cam;
 
     cam.aspect_ratio      = 16.0 / 9.0;
-    cam.image_width       = 1;
-    cam.aa_samples_per_px = 1;
-    cam.ray_bounces         = 1;
+    cam.image_width       = 700;
+    cam.aa_samples_per_px = 5;
+    cam.ray_bounces         = 5;
 
     cam.fov     = 20;
     cam.center = vec3h(13,2,3, 1);
@@ -91,7 +91,7 @@ int main() {
     cam.tilt_angle = 15.0;
     cam.focus_dist    = 10.0;
     cam.render(world, bvh.get_head());
-    std::cout << objects.size() << std::endl;
-    std::cout << "height" << getHeight(bvh.get_head()) << std::endl;
+    //std::cout << objects.size() << std::endl;
+    //std::cout << "height" << getHeight(bvh.get_head()) << std::endl;
     std::cout << world.comparisons << " comparisons" << std::endl;
 }
