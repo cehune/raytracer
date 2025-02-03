@@ -17,14 +17,17 @@ public:
     BVHAggregate(std::vector<std::shared_ptr<hittable>> objs, int max_prims) 
     : max_prims_in_node(max_prims) {
         //  collect prims and add them to list of BVH Primitives
+
         std::vector<BVHPrimitive> bvhPrimitives(objs.size());
         for (size_t i = 0; i < objs.size(); ++i) {
-            bvhPrimitives[i] = BVHPrimitive(i, (*objs[i]).bounds()); // pointer !!!!!!!!!
+            bvhPrimitives[i] = BVHPrimitive(i, (*objs[i]).bounds(), objs[i]); // pointer !!!!!!!!!
         }
+
         // Move ownership of the result from sah_recursive to 'head'
         if (objs.size() != 0) {
             head = sah_recursive(bvhPrimitives);
         }
+
     }
 
     BVHTreeNode* get_head() const {
@@ -33,7 +36,7 @@ public:
 
     std::unique_ptr<BVHTreeNode> sah_recursive(std::vector<BVHPrimitive>& bvhPrimitives) {
         std::unique_ptr<BVHTreeNode> root = std::make_unique<BVHTreeNode>();
-        
+
         // Compute root bounding box (bounding box containing all primitives)
         Bounds3f rootBoundingBox;
         for (const BVHPrimitive& prim : bvhPrimitives) {
@@ -92,7 +95,7 @@ public:
         // Compare to leaf costs (just the num of primitives)
         int leaf_cost = static_cast<int>(bvhPrimitives.size());
         lowest_cost = 1.f / 2.f + lowest_cost / rootBoundingBox.surface_area();
-        if (leaf_cost <= num_prims_right && leaf_cost <= max_prims_in_node) {
+        if (leaf_cost <= lowest_cost && leaf_cost <= max_prims_in_node) {
             // Turn into a leaf node
             root->prims = bvhPrimitives;
             return root;  // Return the unique_ptr directly
