@@ -7,7 +7,8 @@
 struct Bounds3f {
     vec3h pmin, pmax;
 
-    Bounds3f() : pmin(vec3h{0, 0, 0, 1}), pmax(vec3h{0, 0, 0, 1}) {}
+    Bounds3f() : pmin(vec3h{infinity, infinity, infinity, 1}), pmax(vec3h{-1.0 * infinity, -1.0 * infinity, -1.0 * infinity, 1}) {}
+    //Bounds3f() : pmin(vec3h{0.0, 0.0, 0.0, 1}), pmax(vec3h{0.0, 0.0, 0.0, 1}) {}
 
     // Constructor to create bounds from min and max points
     Bounds3f(const vec3h& p1, const vec3h& p2){
@@ -77,50 +78,39 @@ struct Bounds3f {
         A modified version of Smit's algorithm by Amy William et al. 
         An Efficient and Robust Ray–Box Intersection Algorithm 
         */
-        double tmin, tmax, tymin, tymax, tzmin, tzmax;
 
-        // Compare AABB x coords to direction x coords to find the t
-        // value of when the direction intersects the AABB coords
-        if (r.sign_x()) { 
-            tmin = (pmin.x - r.origin().x) * r.inv_direction().x;
-            tmax = (pmax.x - r.origin().x) * r.inv_direction().x;
-        }
-        else {
-            tmin = (pmax.x - r.origin().x) * r.inv_direction().x;
-            tmax = (pmin.x - r.origin().x) * r.inv_direction().x;
-        }
+        double t1, t2, tmin, tmax;
+        // Check for intersection along the X-axis
+        t1 = (pmin.x - r.origin().x) * r.inv_direction().x;
+        t2 = (pmax.x - r.origin().x) * r.inv_direction().x;
+        if (r.inv_direction().x < 0.0f) std::swap(t1, t2);
 
-        // Repeat for y
-        if (r.sign_y()) {
-            tymin = (pmin.y - r.origin().y) * r.inv_direction().y;
-            tymax = (pmax.y - r.origin().y) * r.inv_direction().y;
-        }
-        else {
-            tymin = (pmax.y - r.origin().y) * r.inv_direction().y;
-            tymax = (pmin.y - r.origin().y) * r.inv_direction().y;
-        }
+        // Initialize tmin and tmax
+        tmin = t1;
+        tmax = t2;
 
-        // Check if theres an intersection with x-y plane
-        if ( (tmin > tymax) || (tymin > tmax) ) return false;
-        if (tymin > tmin) tmin = tymin;
-        if (tymax < tmax) tmax = tymax;
-        
-        // Check z axis
-        if (r.sign_z()) {
-            tzmin = (pmin.z - r.origin().z) * r.inv_direction().z;
-            tzmax = (pmax.z - r.origin().z) * r.inv_direction().z;
-        }
-        else {
-            tzmin = (pmax.z - r.origin().z) * r.inv_direction().z;
-            tzmax = (pmin.z - r.origin().z) * r.inv_direction().z;
-        }
+        // Check for intersection along the Y-axis
+        t1 = (pmin.y - r.origin().y) * r.inv_direction().y;
+        t2 = (pmax.y - r.origin().y) * r.inv_direction().y;
+        if (r.inv_direction().y < 0.0f) std::swap(t1, t2);
 
-        // Check if intersection between x-y and z
-        if ( (tmin > tzmax) || (tzmin > tmax) ) return false;
-        if (tzmin > tmin)tmin = tzmin;
-        if (tzmax < tmax)tmax = tzmax;
+        // Update tmin and tmax based on Y-axis intersection
+        tmin = std::max(tmin, t1);
+        tmax = std::min(tmax, t2);
 
-        // Return true if we are in interval bounds.
+        // If the ray doesn't intersect along the Y-axis, return false
+        if (tmin > tmax) return false;
+
+        // Check for intersection along the Z-axis
+        t1 = (pmin.z - r.origin().z) * r.inv_direction().z;
+        t2 = (pmax.z - r.origin().z) * r.inv_direction().z;
+        if (r.inv_direction().z < 0.0f) std::swap(t1, t2);
+
+        // Update tmin and tmax based on Z-axis intersection
+        tmin = std::max(tmin, t1);
+        tmax = std::min(tmax, t2);
+
+        // If the ray doesn't intersect along the Z-axis, return false
         return ((tmin < ray_t.max) && (tmax > ray_t.min));
     }
 };

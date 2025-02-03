@@ -7,10 +7,11 @@
 
 struct BVHPrimitive {
     BVHPrimitive() {}
-    BVHPrimitive(size_t primitiveIndex, const Bounds3f &bounds)
-        : primitiveIndex(primitiveIndex), bounds(bounds) {}
+    BVHPrimitive(size_t primitiveIndex, const Bounds3f &bounds, shared_ptr<hittable> obj)
+        : primitiveIndex(primitiveIndex), bounds(bounds), object(obj) {}
     size_t primitiveIndex;
     Bounds3f bounds;
+    shared_ptr<hittable> object;
     // BVHPrimitive Public Methods
     vec3h Centroid() const { return .5f * bounds.pmin + .5f * bounds.pmax; }
 };

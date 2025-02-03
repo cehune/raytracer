@@ -183,5 +183,8 @@ vec3h vec_min(const vec3h& u, const vec3h& v) {
     */
     return vec3h(std::min(u.x, v.x), std::min(u.y, v.y), std::min(u.z, v.z), 1);
 }
+void print(const vec3h&u) {
+    std::cout << "x: " << u.x << ", y: " << u.y << ", z: "<< u.z << std::endl;
+}
 
 #endif

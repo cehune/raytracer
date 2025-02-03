@@ -36,22 +36,21 @@ private:
     }
 
 
-    color ray_color(const ray& r, int depth, const hittable& world) const {
+    color ray_color(const ray& r, int depth, const hittable_list& world, BVHTreeNode* head) const {
         hit_record rec;
-
         if (depth <= 0) {
             return color(0,0,0,0);
         }
 
         // set interval start at 0.001 to prevent a ray from bouncing with it's start surface due to float roundoff
-        if (world.intersect(r, interval(0.001, infinity), rec)) {
+        if (world.intersect(head, r, interval(0.001, infinity), rec)) {
             //I think we need to put this reflective behaviour based on the material property of the element itself
             // This is semi lambertian, where we are basing new ray direction on the normal, but not true
             // Scatters rays towards the normals, but randomly
             ray scattered;
             color attenuation;
             if (rec.mat->scatter(r, rec, attenuation, scattered))
-                return hadamard_product(attenuation, ray_color(scattered, depth-1, world));
+                return hadamard_product(attenuation, ray_color(scattered, depth-1, world, head));
             return color(0,0,0,0);
         }
 
@@ -89,7 +88,7 @@ public:
     void set_img_width(int w) {image_width = w;}
     
 
-    void render(const hittable& world) {
+    void render(const hittable_list& world, BVHTreeNode* head) {
         initialize();
         std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
@@ -97,10 +96,9 @@ public:
             std::clog << "\rScanlines remaining: " << (image_height - j) << ' ' << std::flush;
             for (int i = 0; i < image_width; i++) {
                 vec3h pixel_color = vec3h();
-
                 for (int s = 0; s < aa_samples_per_px; s++) {
                     ray offset_ray = generate_offset_ray(i, j, s);
-                    pixel_color += ray_color(offset_ray, ray_bounces, world);
+                    pixel_color += ray_color(offset_ray, ray_bounces, world, head);
                 }
                 write_color(std::cout, pixel_samples_scale * pixel_color);
             }

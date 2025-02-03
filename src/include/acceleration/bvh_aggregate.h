@@ -19,7 +19,7 @@ public:
         //  collect prims and add them to list of BVH Primitives
         std::vector<BVHPrimitive> bvhPrimitives(objs.size());
         for (size_t i = 0; i < objs.size(); ++i) {
-            bvhPrimitives[i] = BVHPrimitive(i, (*objs[i]).bounds()); // pointer !!!!!!!!!
+            bvhPrimitives[i] = BVHPrimitive(i, (*objs[i]).bounds(), objs[i]); // pointer !!!!!!!!!
         }
         // Move ownership of the result from sah_recursive to 'head'
         if (objs.size() != 0) {
@@ -33,12 +33,14 @@ public:
 
     std::unique_ptr<BVHTreeNode> sah_recursive(std::vector<BVHPrimitive>& bvhPrimitives) {
         std::unique_ptr<BVHTreeNode> root = std::make_unique<BVHTreeNode>();
-        
+
         // Compute root bounding box (bounding box containing all primitives)
         Bounds3f rootBoundingBox;
+        int i = 0;
         for (const BVHPrimitive& prim : bvhPrimitives) {
             rootBoundingBox = Union(rootBoundingBox, prim.bounds);
         }
+
         root->bounds = rootBoundingBox;
         // Find largest axis to monitor
         int largest_axis = rootBoundingBox.max_dimen();
@@ -56,16 +58,22 @@ public:
             // Expand the bound's of the grouping in the bucket
             buckets[bucket_number].bounds = Union(buckets[bucket_number].bounds, bvh_prim.bounds);
         }
+        std::vector <BVHBucket> clamped_buckets;
+        for (int i = 0; i < num_buckets; i++) {
+            if (buckets[i].num_prims > 0) {
+                clamped_buckets.push_back(buckets[i]);
+            }
+        }
 
         double num_prims_left = 0;
-        const int num_splits = num_buckets - 1;
-        double costs[num_splits] = {}; // Initialize costs
+        int num_splits = static_cast<int>(clamped_buckets.size()) - 1;
+        std::vector<double> costs(num_splits); // Initialize costs
 
         // Accumulate costs at each split from the left side
         Bounds3f boundBelow;
         for (int i = 0; i < num_splits; ++i) {
-            boundBelow = Union(boundBelow, buckets[i].bounds);
-            num_prims_left += buckets[i].num_prims;
+            boundBelow = Union(boundBelow, clamped_buckets[i].bounds);
+            num_prims_left += clamped_buckets[i].num_prims;
             costs[i] += num_prims_left * boundBelow.surface_area();
         }
 
@@ -73,8 +81,8 @@ public:
         int num_prims_right = 0;
         Bounds3f boundAbove;
         for (int i = num_splits; i >= 1; --i) {
-            boundAbove = Union(boundAbove, buckets[i].bounds);
-            num_prims_right += buckets[i].num_prims;
+            boundAbove = Union(boundAbove, clamped_buckets[i].bounds);
+            num_prims_right += clamped_buckets[i].num_prims;
             costs[i - 1] += num_prims_right * boundAbove.surface_area();
         }
 
@@ -92,7 +100,7 @@ public:
         // Compare to leaf costs (just the num of primitives)
         int leaf_cost = static_cast<int>(bvhPrimitives.size());
         lowest_cost = 1.f / 2.f + lowest_cost / rootBoundingBox.surface_area();
-        if (leaf_cost <= num_prims_right && leaf_cost <= max_prims_in_node) {
+        if (leaf_cost <= lowest_cost && leaf_cost <= max_prims_in_node) {
             // Turn into a leaf node
             root->prims = bvhPrimitives;
             return root;  // Return the unique_ptr directly
@@ -112,9 +120,24 @@ public:
             
             std::vector<BVHPrimitive> leftPrims(bvhPrimitives.begin(), midIter);
             std::vector<BVHPrimitive> rightPrims(midIter, bvhPrimitives.end());
+
+            if (lowest_cost_split == -1 || leftPrims.empty() || rightPrims.empty()) {
+                auto mid = bvhPrimitives.begin() + bvhPrimitives.size() / 2;
+                std::nth_element(bvhPrimitives.begin(), mid, bvhPrimitives.end(), 
+                    [largest_axis](const BVHPrimitive& a, const BVHPrimitive& b) {
+                        return a.Centroid()[largest_axis] < b.Centroid()[largest_axis];
+                    });
+                leftPrims.assign(bvhPrimitives.begin(), mid);
+                rightPrims.assign(mid, bvhPrimitives.end());
+            }
+            
             // Allocate child nodes on right and left
-            root->left = sah_recursive(leftPrims);
-            root->right = sah_recursive(rightPrims);
+            if (leftPrims.size() > 0) {
+                root->left = sah_recursive(leftPrims);
+            }
+            if (rightPrims.size() > 0) {
+                root->right = sah_recursive(rightPrims);
+            }
         }
 
         return root;
