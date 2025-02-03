@@ -31,7 +31,7 @@ public:
     const vec3h& inv_direction() const { return inv_dir; }
     const bool sign_x() const { return signx; }
     const bool sign_y() const { return signy; }
-    const bool sign_z() const { return signy; }
+    const bool sign_z() const { return signz; }
 
     void set_direction(vec3h& d) {
         dir = d;

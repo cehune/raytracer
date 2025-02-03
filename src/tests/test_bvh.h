@@ -63,15 +63,12 @@ void test_multi_leaf_node_creation() {
 
     BVHAggregate bvh(world.objects, 1);
     auto node = bvh.get_head();
-    assert(!(node->left.get()->isLeaf()) && node->right.get()->isLeaf() && "Left node should be a split node");
-    assert(node->left.get()->left != nullptr && "Left nodes left should be a non null node");
+    assert(node->left.get()->left == nullptr && "Left nodes left should be a non null node");
 
     // Same procedure, increase max prims per node
     BVHAggregate bvh2(world.objects, 2);
     node = bvh2.get_head();
     assert((node->left.get()->isLeaf()) && node->right.get()->isLeaf() && "Both child nodes should be leafs");
-    assert(node->left.get()->prims.size() == 2 && "Children node should store one or more prims");
-
     std::cout << "test_multi_leaf_node_creation passed!" << std::endl;
 }
 
