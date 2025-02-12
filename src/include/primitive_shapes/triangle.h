@@ -38,9 +38,14 @@ std::shared_ptr<bxdf> mat; // Material for the sphere
     triangle(const vec3h& p0, const vec3h& p1, const vec3h& p2) 
         : p0(p0), p1(p1), p2(p2), mat(std::make_shared<diffuseBXDF>(color(0.5, 0.5, 0.5, 0))) {}
 
+    triangle() : p0(vec3h()), p1(vec3h()), p2(vec3h()), mat(std::make_shared<diffuseBXDF>(color(0.5, 0.5, 0.5, 0))) {}
+
     bool intersect(const ray& r, interval ray_t, hit_record& rec) const override;
     Bounds3f bounds() const override;
     double area(const vec3h& p0, const vec3h& p1, const vec3h& p2) const;
+
+    friend void test_permutation();
+    friend void test_shear();
 };
 
 bool triangle::intersect(const ray& r, interval ray_t, hit_record& rec) const {
@@ -180,6 +185,5 @@ double triangle::area(const vec3h& p0, const vec3h& p1, const vec3h& p2) const{
 Bounds3f triangle::bounds() const  { 
     return Bounds3f();  //
 }
-
 
 #endif
