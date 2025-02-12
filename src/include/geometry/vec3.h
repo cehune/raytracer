@@ -76,6 +76,12 @@ class vec3h {
         // Return true if the vector is close to zero in all dimensions.
         return (std::fabs(x) < 1e-8) && (std::fabs(y) < 1e-8) && (std::fabs(z) < 1e-8);
     }
+
+    int max_dimen() const {
+        if (x > y && x > z) return 0;
+        else if (y > z)     return 1;
+        else                return 2;
+    }
 };
 
 // Vector Utility Functions

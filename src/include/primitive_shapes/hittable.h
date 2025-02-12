@@ -26,6 +26,7 @@ class hittable {
   public:
     virtual ~hittable() = default;
     virtual Bounds3f bounds() const = 0;
+    
     virtual bool intersect(const ray& r, interval ray_t, hit_record& rec) const = 0;
 };
 
