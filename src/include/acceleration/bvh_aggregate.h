@@ -26,7 +26,6 @@ public:
         if (objs.size() != 0) {
             head = sah_recursive(bvhPrimitives);
         }
-        //std::cout << bvhPrimitives.size() << " whaoo" <<  std::endl;;
     }
 
     BVHTreeNode* get_head() const {
@@ -44,7 +43,6 @@ public:
         }
 
         root->bounds = rootBoundingBox;
-        
         // Find largest axis to monitor
         int largest_axis = rootBoundingBox.max_dimen();
 
