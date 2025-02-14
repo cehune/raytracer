@@ -5,6 +5,7 @@
 #include "./hittable.h"
 #include "../geometry/vec3.h"
 #include "../materials/bxdf.h"
+#include "../geometry/bounds.h"
 #include "../materials/diffuseBXDF.h"
 
 struct triangleIntersection {
@@ -15,6 +16,10 @@ struct triangleIntersection {
         : b0(a0), b1(a1), b2(a2), dist(t_), valid(true) {}
 
     triangleIntersection() : b0(0), b1(0), b2(0), dist(0), valid(false) {}
+};
+
+struct triangleMesh {
+    std::vector<triangle> triangles;
 };
 
 class triangle : public hittable {
@@ -60,6 +65,7 @@ bool triangle::intersect(const ray& r, interval ray_t, hit_record& rec) const {
     rec.p = r.line(t);
     rec.normal = normal;
     rec.mat = mat;
+    //std::cout << "wahoo" << std::endl;
     return true;
 }
 
@@ -76,22 +82,18 @@ triangleIntersection triangle::check_intersection(const ray& r, interval ray_t, 
     vec3h p0_t = p0 - r.origin(); 
     vec3h p1_t = p1 - r.origin();
     vec3h p2_t = p2 - r.origin();
-    std::cout << p0_t << " " << p1_t << " " << p2_t << std::endl;
 
     // Permutation, desire z axis as longest axis
     permutation(r.direction(), dir_t, p0_t, p1_t, p2_t);
-    std::cout << p0_t << " " << p1_t << " " << p2_t << std::endl;
 
     // Shearing
     shear(dir_t, p0_t, p1_t, p2_t);
-    std::cout << p0_t << " " << p1_t << " " << p2_t << std::endl;
 
 
     // Edge tests
     double e0 = (p1_t.x * p2_t.y) - (p1_t.y * p2_t.x);
     double e1 = (p2_t.x * p0_t.y) - (p2_t.y * p0_t.x);
     double e2 = (p0_t.x * p1_t.y) - (p0_t.y * p1_t.x);
-    std::cout << e0 << " " << e1 << " " << e2 << std::endl;
     double det = e0 + e1 + e2;
     if (!((e0 >= 0 && e1 >= 0 && e2 >= 0) || (e0 <= 0 && e1 <= 0 && e2 <= 0))) {
         return triangleIntersection(); // (0,0) not in triangle 
@@ -159,9 +161,6 @@ void triangle::shear(vec3h& dirt, vec3h& p0t, vec3h& p1t, vec3h& p2t) const{
     double shear_y = -dirt.y / dirt.z;
     double shear_z = 1.0 / dirt.z;
 
-    std::cout << dirt << std::endl;
-
-
     p0t.x += p0t.z * shear_x;
     p0t.y += p0t.z * shear_y;
     p0t.z *= shear_z;
@@ -183,7 +182,9 @@ double triangle::area(const vec3h& p0, const vec3h& p1, const vec3h& p2) const{
 }
 
 Bounds3f triangle::bounds() const  { 
-    return Bounds3f();  //
+    Bounds3f b = Bounds3f(p0, p1);
+    b.expand(p2);
+    return b;
 }
 
 #endif
