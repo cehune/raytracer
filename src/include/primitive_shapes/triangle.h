@@ -19,13 +19,22 @@ struct triangleIntersection {
     triangleIntersection() : b0(0), b1(0), b2(0), dist(0), valid(false) {}
 };
 
+struct triangleMesh {
+    std::vector<vec3h> vertices;  // Stores unique vertex positions
+    std::vector<int> indices;     // Stores triangle vertex indices (3 per triangle)
+    int num_triangles = 0;
+    std::shared_ptr<bxdf> mat; // Shared material for all triangles
+    triangleMesh(const std::vector<vec3h>& verts, const std::vector<int>& inds, int num_tri,  std::shared_ptr<bxdf> mat)
+        : vertices(verts), indices(inds), num_triangles(num_tri), mat(mat) {}
+    triangleMesh(const std::vector<vec3h>& verts, const std::vector<int>& inds, int num_tri)
+        : vertices(verts), indices(inds), num_triangles(num_tri), mat(std::make_shared<diffuseBXDF>(color(0.5, 0.5, 0.5, 0))) {}
+    void load_objects(std::vector<shared_ptr<hittable>>& objects);
+};
 
 class triangle : public hittable {
 private:
+    triangleMesh* mesh = nullptr;;
     int mesh_index;
-    vec3h p0, p1, p2;
-    vec3h center;
-    double radius;
     triangleIntersection check_intersection(const ray& r, interval ray_t, vec3h p0, vec3h p1, vec3h p2) const;
     void permutation(vec3h direction, vec3h& dirt, vec3h& p0t, vec3h& p1t, vec3h& p2t) const;
     void shear(vec3h& dirt, vec3h& p0t, vec3h& p1t, vec3h& p2t) const;
@@ -34,28 +43,35 @@ private:
 std::shared_ptr<bxdf> mat; // Material for the sphere
 
     // Constructor with material
-    triangle(const vec3h& p0, const vec3h& p1, const vec3h& p2, std::shared_ptr<bxdf> material) 
-        : p0(p0), p1(p1), p2(p2), mat(material) {}
+    triangle(triangleMesh* triMesh, int mesh_index, std::shared_ptr<bxdf> material) 
+        : mesh(triMesh), mesh_index(mesh_index), mat(material) {}
 
     // Constructor without explicit material (default material)
-    triangle(const vec3h& p0, const vec3h& p1, const vec3h& p2) 
-        : p0(p0), p1(p1), p2(p2), mat(std::make_shared<diffuseBXDF>(color(0.5, 0.5, 0.5, 0))) {}
+    triangle(triangleMesh* triMesh, int mesh_index) 
+        : mesh(triMesh), mesh_index(mesh_index), mat(std::make_shared<diffuseBXDF>(color(0.5, 0.5, 0.5, 0))) {}
 
-    triangle() : p0(vec3h()), p1(vec3h()), p2(vec3h()), mat(std::make_shared<diffuseBXDF>(color(0.5, 0.5, 0.5, 0))) {}
+    triangle() : mesh(nullptr), mesh_index(-1), mat(std::make_shared<diffuseBXDF>(color(0.5, 0.5, 0.5, 0))) {}
 
     bool intersect(const ray& r, interval ray_t, hit_record& rec) const override;
     Bounds3f bounds() const override;
     double area(const vec3h& p0, const vec3h& p1, const vec3h& p2) const;
-
+    double area() const;
     friend void test_permutation();
     friend void test_shear();
 };
 
-struct triangleMesh {
-    std::vector<triangle> triangles;
-};
+
 
 bool triangle::intersect(const ray& r, interval ray_t, hit_record& rec) const {
+    int i0 = mesh->indices[3 * mesh_index];
+    int i1 = mesh->indices[3 * mesh_index + 1];
+    int i2 = mesh->indices[3 * mesh_index + 2];
+    
+    vec3h p0 = mesh->vertices[i0];
+    vec3h p1 = mesh->vertices[i1];
+    vec3h p2 = mesh->vertices[i2];
+
+
     triangleIntersection triIntersection = check_intersection(r, ray_t, p0, p1, p2);
     if (triIntersection.valid == false) return false;
 
@@ -67,7 +83,6 @@ bool triangle::intersect(const ray& r, interval ray_t, hit_record& rec) const {
     rec.p = r.line(t);
     rec.normal = normal;
     rec.mat = mat;
-    //std::cout << "wahoo" << std::endl;
     return true;
 }
 
@@ -174,7 +189,7 @@ void triangle::shear(vec3h& dirt, vec3h& p0t, vec3h& p1t, vec3h& p2t) const{
     p2t.z *= shear_z;
 }
 
-double triangle::area(const vec3h& p0, const vec3h& p1, const vec3h& p2) const{    
+double triangle::area(const vec3h& p0, const vec3h& p1, const vec3h& p2) const {    
     // Calculates the area of a triangle given the 3 points that define it's vertice
     // recall cross length gives area of parallelogram, so we half that
     vec3h a = p1 - p0;
@@ -183,10 +198,42 @@ double triangle::area(const vec3h& p0, const vec3h& p1, const vec3h& p2) const{
     return 0.5 * cross_product(a,b).magnitude();
 }
 
+
+double triangle::area() const {    
+    // Calculates the area of a triangle given the 3 points that define it's vertice
+    // recall cross length gives area of parallelogram, so we half that
+    int i0 = mesh->indices[3 * mesh_index];
+    int i1 = mesh->indices[3 * mesh_index + 1];
+    int i2 = mesh->indices[3 * mesh_index + 2];
+    
+    vec3h p0 = mesh->vertices[i0];
+    vec3h p1 = mesh->vertices[i1];
+    vec3h p2 = mesh->vertices[i2];
+    
+    vec3h a = p1 - p0;
+    vec3h b = p2 - p0;
+
+    return 0.5 * cross_product(a,b).magnitude();
+}
+
 Bounds3f triangle::bounds() const  { 
+    int i0 = mesh->indices[3 * mesh_index];
+    int i1 = mesh->indices[3 * mesh_index + 1];
+    int i2 = mesh->indices[3 * mesh_index + 2];
+    
+    vec3h p0 = mesh->vertices[i0];
+    vec3h p1 = mesh->vertices[i1];
+    vec3h p2 = mesh->vertices[i2];
+
     Bounds3f b = Bounds3f(p0, p1);
     b.expand(p2);
     return b;
+}
+
+void triangleMesh::load_objects(std::vector<shared_ptr<hittable>>& objects) {
+    for (int i = 0; i < num_triangles; i++) {
+        objects.push_back(make_shared<triangle>(this, i - 1, mat));
+    }
 }
 
 #endif
