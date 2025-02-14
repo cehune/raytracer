@@ -60,9 +60,6 @@ void test_dist() {
 
 }
 
-#include <iostream>
-#include <cassert>
-
 void test_permutation() {
     // Create a triangle and direction vectors
     vec3h p0(3, 0, -1, 1);

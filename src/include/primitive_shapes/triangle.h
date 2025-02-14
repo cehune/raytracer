@@ -2,6 +2,7 @@
 #define TRIANGLE_H
 
 #include <iostream>
+#include <vector>
 #include "./hittable.h"
 #include "../geometry/vec3.h"
 #include "../materials/bxdf.h"
@@ -18,9 +19,6 @@ struct triangleIntersection {
     triangleIntersection() : b0(0), b1(0), b2(0), dist(0), valid(false) {}
 };
 
-struct triangleMesh {
-    std::vector<triangle> triangles;
-};
 
 class triangle : public hittable {
 private:
@@ -51,6 +49,10 @@ std::shared_ptr<bxdf> mat; // Material for the sphere
 
     friend void test_permutation();
     friend void test_shear();
+};
+
+struct triangleMesh {
+    std::vector<triangle> triangles;
 };
 
 bool triangle::intersect(const ray& r, interval ray_t, hit_record& rec) const {
