@@ -121,7 +121,10 @@ void test_shear() {
     vec3h p0(3, 0, -1, 1);
     vec3h p1(3, 1, 0, 1);
     vec3h p2(3, 0, 1, 1);
-    triangle tri(p0, p1, p2);
+    std::vector<vec3h> tri_vertices = {p0, p1, p2};
+    std::vector<int> indices = {0,1,2};
+    triangleMesh mesh = triangleMesh(tri_vertices, indices, 1);
+    triangle tri(&mesh, 0);
     
 
     // Test case where dirt = (1.0, 2.0, 3.0)
