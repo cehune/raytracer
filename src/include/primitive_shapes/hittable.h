@@ -12,6 +12,8 @@ class hit_record {
     vec3h normal; // surface normal to the position
     shared_ptr<bxdf> mat;
     double t; // scaling distance
+    double u;
+    double v; // u, v are for texture mapping
     bool front_face;
 
     /* Setup so normals always point outward from the surface. Do this at geometry time

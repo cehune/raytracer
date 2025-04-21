@@ -7,20 +7,22 @@
 #include "../color.h"
 #include "../ray.h"
 #include "scattering.h"
+#include "../texture.h"
 
 class diffuseBXDF : public bxdf {
 private:
     color albedo;
     color light_color;
     ray light_direction;
+    shared_ptr<texture> tex;
 
 public:
-    diffuseBXDF(const color& albedo) : albedo(albedo), light_color(color(1,1,1,0)){}
-
+    diffuseBXDF(const color& albedo) : tex(make_shared<solid_color>(albedo)) {}
+    diffuseBXDF(shared_ptr<texture> tex) : tex(tex) {}
+    
     bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const override {
         // TODO: This is not full attenuation formula, scale for light direction too
-        attenuation = color(albedo.x * light_color.x, 
-            albedo.y * light_color.y, albedo.z * light_color.z, 0);
+        attenuation = tex->value(rec.u, rec.v, rec.p);
         vec3h direction = scatter_diffuse(rec.normal);
         scattered = ray(rec.p, direction);
         return true;

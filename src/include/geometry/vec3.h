@@ -17,6 +17,7 @@ class vec3h {
 
     vec3h() : x(0.0), y(0.0), z(0.0), w(0.0) {};
     vec3h(double x0, double y0, double z0, double w0) : x(x0), y(y0), z(z0), w(w0) {};
+    vec3h(double x0, double y0, double z0) : x(x0), y(y0), z(z0), w(0.0) {};
 
     double magnitude() const {
         return std::sqrt(x * x + y * y + z * z);
