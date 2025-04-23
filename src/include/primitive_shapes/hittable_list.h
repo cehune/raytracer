@@ -7,6 +7,9 @@
 #include "hittable.h"
 #include "../acceleration/bvh_util.h"
 #include "../geometry/vec3.h"
+#include "triangle.h"
+#include "quadrilateral.h"
+
 using std::make_shared;
 using std::shared_ptr;
 
@@ -20,8 +23,18 @@ public:
 
     void clear() { objects.clear(); }
 
-    void add(shared_ptr<hittable> object) {
+    void add(std::shared_ptr<hittable> object) {
         objects.push_back(object);
+    }
+
+    void add(triangleMesh* mesh) {
+        for (int i = 0; i < mesh->num_triangles; i++) {
+            objects.push_back(std::make_shared<triangle>(mesh, i, mesh->mat));
+        }
+    }
+
+    void add(quadrilateral *quad) {
+        add(&quad->mesh);
     }
 
 bool intersect(BVHTreeNode* head, const ray& r, interval ray_t, hit_record& rec) const {

@@ -33,7 +33,7 @@ struct triangleMesh {
 
 class triangle : public hittable {
 private:
-    triangleMesh* mesh = nullptr;;
+    triangleMesh* mesh = nullptr;
     int mesh_index;
     triangleIntersection check_intersection(const ray& r, interval ray_t, vec3h p0, vec3h p1, vec3h p2) const;
     void permutation(vec3h direction, vec3h& dirt, vec3h& p0t, vec3h& p1t, vec3h& p2t) const;
@@ -232,7 +232,7 @@ Bounds3f triangle::bounds() const  {
 
 void triangleMesh::load_objects(std::vector<shared_ptr<hittable>>& objects) {
     for (int i = 0; i < num_triangles; i++) {
-        objects.push_back(make_shared<triangle>(this, i - 1, mat));
+        objects.push_back(make_shared<triangle>(this, i, mat));
     }
 }
 
