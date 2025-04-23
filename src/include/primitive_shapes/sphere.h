@@ -47,10 +47,24 @@ std::shared_ptr<bxdf> mat; // Material for the sphere
         rec.t = root;
         rec.p = r.line(rec.t);
         rec.mat = mat;
-        rec.normal = (rec.p - center) / radius;
+        vec3h outward_normal = (rec.p - center) / radius;
+        rec.set_face_normal(r, outward_normal);
+        get_sphere_uv(outward_normal, rec.u, rec.v);
         // Set the normal, point, and ray direction scalar to hit record
         return true;
     }   
+
+    static void get_sphere_uv(const vec3h& p, double& u, double& v) {
+        // Normalized angles u: phi, v: theta
+        // u: returned value [0,1] of angle around the Y axis from X=-1.
+        // v: returned value [0,1] of angle from Y=-1 to Y=+1.
+
+        auto theta = std::acos(-p.y);
+        auto phi = std::atan2(-p.z, p.x) + pi;
+
+        u = phi / (2*pi);
+        v = theta / pi;
+    }
 
     Bounds3f bounds() const { 
         vec3h pmin = center - vec3h(radius, radius, radius, 1);  // Center minus radius
