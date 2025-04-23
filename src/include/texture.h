@@ -50,7 +50,6 @@ class checker_texture : public texture {
   };
 
 
-  
 class image_texture : public texture {
   public:
     image_texture(const char* filename) : image(filename) {}
@@ -74,7 +73,5 @@ class image_texture : public texture {
   private:
     rtw_image image;
 };
-
-
 
 #endif
