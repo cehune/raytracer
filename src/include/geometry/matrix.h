@@ -65,6 +65,19 @@ public:
         return ret;
     }
 
+    
+    squareMatrix operator*(squareMatrix& m) {
+        squareMatrix ret;
+        for (int i = 0; i < N; ++i){
+            for (int j = 0; j < N; ++j) {
+                for (int k = 0; k < N; ++k){
+                    ret[i][j] += matrix[i][k] * m[k][j];
+                }
+            }
+        }
+        return ret;
+    }
+
     squareMatrix operator*(double x) {
         squareMatrix ret = *this;
         for (int i = 0; i < N; ++i){

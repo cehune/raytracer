@@ -2,6 +2,7 @@
 #include "../include/materials/diffuseBXDF.h"
 #include "../include/primitive_shapes/triangle.h"
 #include <cassert>
+#include <vector>
 
 void test_area() {
     vec3h p0(0.0, 0.0, 0.0, 1);
@@ -150,12 +151,37 @@ void test_shear() {
 }
 
 
+void test_apply_total_transform() {
+    const double A_data[4][4] = {
+        {2, 3, 4, 0},
+        {6, 1, 0, 0},
+        {0, 2, 3, 0},
+        {0, 0, 0, 1}
+    };
+    std::vector<vec3h> vertices = {
+        vec3h(1, 0, 0, 1), vec3h(5, 3, 1, 1), vec3h(7, 1, 5, 1)
+    };
+    std::vector<int> indices = {0, 1, 2};
+
+    squareMatrix<4> A(A_data);
+    triangleMesh mesh(vertices, indices, 2);
+    transform t1 = transform(A_data);
+    mesh.apply_total_transform(t1);
+    assert(mesh.vertices[0] == vec3h(2,6,0,1));
+    assert(mesh.vertices[1] == vec3h(23,33,9,1));
+    assert(mesh.vertices[2] == vec3h(37,43,17,1));
+
+    std::cout << "test_apply_total_transform passed!\n";
+    
+}
+
 int run_test_triangle() {
     std::cout << "\n Starting tests for /primative_shapes/triangle\n\n";
     test_area();
     test_intersection();
     test_no_intersection();
     test_dist();
+    test_apply_total_transform();
     std::cout << "All tests passed!" << std::endl;
     return 0;
 }

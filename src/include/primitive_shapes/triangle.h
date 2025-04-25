@@ -7,7 +7,9 @@
 #include "../geometry/vec3.h"
 #include "../materials/bxdf.h"
 #include "../geometry/bounds.h"
+#include "../geometry/transform.h"
 #include "../materials/diffuseBXDF.h"
+
 
 struct triangleIntersection {
     double b0, b1, b2, dist;
@@ -28,6 +30,11 @@ struct triangleMesh {
         : vertices(verts), indices(inds), num_triangles(num_tri), mat(mat) {}
     triangleMesh(const std::vector<vec3h>& verts, const std::vector<int>& inds, int num_tri)
         : vertices(verts), indices(inds), num_triangles(num_tri), mat(std::make_shared<diffuseBXDF>(color(0.5, 0.5, 0.5, 0))) {}
+    void apply_total_transform(transform& t) {
+        for (int i = 0; i < vertices.size(); i++) {
+            vertices[i] = apply_transform(t.m, vertices[i]);
+        }
+    }
 };
 
 class triangle : public hittable {

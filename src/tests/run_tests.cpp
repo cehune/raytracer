@@ -14,5 +14,5 @@ int main() {
     run_test_transform();
     run_test_math();
     run_test_bvh();
-    //run_test_triangle();
+    run_test_triangle();
 }

@@ -1,3 +1,5 @@
+#ifndef TRANSFORM_H
+#define TRANSFORM_H
 /*
 General transformation utils for generating a transformation matrix
 */ 
@@ -11,18 +13,14 @@ public:
     transform(const squareMatrix<4>& m) : m(m) {}
     squareMatrix<4> m;
 
-    transform translation(vec3h delta);
-    transform scale(double x, double y, double z);
-    transform rotateX(double theta);
-    transform rotateY(double theta);
-    transform rotateZ(double theta); // :P from khush
-    transform lookAt(vec3h pos, vec3h look, vec3h up);
-    transform orthographic(double znear, double zfar);
-    transform perspective(double fov, double znear, double zfar);
 };
 
 vec3h apply_transform(squareMatrix<4> &transform, vec3h u) {
     return u*transform;
+}
+
+transform combine_transform(transform &t1, transform &t2) {
+    return transform(t1.m * t2.m);
 }
 
 transform translate(vec3h delta) {
@@ -54,6 +52,7 @@ transform scale(double x, double y, double z) {
 transform rotateX(double theta) {
     /*
     Generates a matrix transform that applies a rotation about the 'x' axis. 
+    Expects angle to be in radians
     */
     double sin_theta = std::sin(theta);
     double cos_theta = std::cos(theta);
@@ -69,6 +68,7 @@ transform rotateX(double theta) {
 transform rotateY(double theta) {
     /*
     Generates a matrix transform that applies a rotation about the 'y' axis. 
+    Expects angle to be in radians
     */
     double sin_theta = std::sin(theta);
     double cos_theta = std::cos(theta);
@@ -84,6 +84,7 @@ transform rotateY(double theta) {
 transform rotateZ(double theta) {
     /*
     Generates a matrix transform that applies a rotation about the 'z' axis. 
+    Expects angle to be in radians
     */
     double sin_theta = std::sin(theta);
     double cos_theta = std::cos(theta);
@@ -158,3 +159,4 @@ transform perspective(double fov, double znear, double zfar) {
 }
 
 
+#endif

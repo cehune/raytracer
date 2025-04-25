@@ -15,6 +15,44 @@ bool matricesAreEqual(const squareMatrix<4>& m1, const squareMatrix<4>& m2, doub
     return true;
 }
 
+void test_matrix_multiplication() {
+    const double A_data[4][4] = {
+        {1, 2, 3, 4},
+        {0, 1, 4, 2},
+        {5, 6, 0, 1},
+        {3, 2, 1, 0}
+    };
+
+    const double B_data[4][4] = {
+        {1, 0, 2, 1},
+        {0, 1, 3, 0},
+        {1, 0, 0, 4},
+        {0, 2, 1, 3}
+    };
+
+    const double expected_result[4][4] = {
+        {6, 10, 13, 29},
+        {4, 10, 7, 18},
+        {11, 12, 28, 7},
+        {5, 4, 9, 10}
+    };
+
+    squareMatrix<4> A(A_data);
+    squareMatrix<4> B(B_data);
+    squareMatrix<4> expected(expected_result);
+
+    squareMatrix<4> result = A * B;
+
+    assert(matricesAreEqual(result, expected));
+
+    transform t1(A_data);
+    transform t2(B_data);
+    transform t3 = combine_transform(t1, t2);
+    assert(matricesAreEqual(t3.m, expected));
+
+    std::cout << "test_matrix_multiplication passed!\n";
+}
+
 void test_translation() {
     vec3h delta(1, 2, 3, 1);
     transform result = translate(delta);
