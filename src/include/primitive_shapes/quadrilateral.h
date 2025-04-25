@@ -19,6 +19,11 @@ struct quadrilateral {
             std::vector<int>{ 0, 1, 2, 1, 2, 3 },
             2, material
           ){}
+    void apply_total_transform(transform& t); 
 };
+
+void quadrilateral::apply_total_transform(transform& t) {
+    mesh.apply_total_transform(t);
+}
 
 #endif
