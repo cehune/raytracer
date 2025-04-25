@@ -31,8 +31,8 @@ struct triangleMesh {
     triangleMesh(const std::vector<vec3h>& verts, const std::vector<int>& inds, int num_tri)
         : vertices(verts), indices(inds), num_triangles(num_tri), mat(std::make_shared<diffuseBXDF>(color(0.5, 0.5, 0.5, 0))) {}
     void apply_total_transform(transform& t) {
-        for (auto v: vertices) {
-            v = apply_transform(t.m, v);
+        for (int i = 0; i < vertices.size(); i++) {
+            vertices[i] = apply_transform(t.m, vertices[i]);
         }
     }
 };
