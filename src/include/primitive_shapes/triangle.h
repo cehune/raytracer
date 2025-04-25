@@ -28,7 +28,6 @@ struct triangleMesh {
         : vertices(verts), indices(inds), num_triangles(num_tri), mat(mat) {}
     triangleMesh(const std::vector<vec3h>& verts, const std::vector<int>& inds, int num_tri)
         : vertices(verts), indices(inds), num_triangles(num_tri), mat(std::make_shared<diffuseBXDF>(color(0.5, 0.5, 0.5, 0))) {}
-    void load_objects(std::vector<shared_ptr<hittable>>& objects);
 };
 
 class triangle : public hittable {
@@ -228,12 +227,6 @@ Bounds3f triangle::bounds() const  {
     Bounds3f b = Bounds3f(p0, p1);
     b.expand(p2);
     return b;
-}
-
-void triangleMesh::load_objects(std::vector<shared_ptr<hittable>>& objects) {
-    for (int i = 0; i < num_triangles; i++) {
-        objects.push_back(make_shared<triangle>(this, i, mat));
-    }
 }
 
 #endif
