@@ -13,6 +13,10 @@ class bxdf {
     ) const {
         return false;
     }
+
+    virtual color emitted(double u, double v, const vec3h& p) const {
+        return color(0,0,0);
+    }
 };
 
 #endif
