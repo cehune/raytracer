@@ -33,7 +33,7 @@ public:
         }
     }
 
-    void add(quadrilateral *quad) {
+    void add(quadrilateral*quad) {
         add(&quad->mesh);
     }
 

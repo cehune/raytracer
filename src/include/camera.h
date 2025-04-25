@@ -39,7 +39,7 @@ private:
     color ray_color(const ray& r, int depth, const hittable_list& world, BVHTreeNode* head) const {
         hit_record rec;
         if (depth <= 0) {
-            return color(0,0,0,0);
+            return background;
         }
 
         // set interval start at 0.001 to prevent a ray from bouncing with it's start surface due to float roundoff
@@ -49,14 +49,14 @@ private:
             // Scatters rays towards the normals, but randomly
             ray scattered;
             color attenuation;
+            color color_from_emission = rec.mat->emitted(rec.u, rec.v, rec.p);
             if (rec.mat->scatter(r, rec, attenuation, scattered))
-                return hadamard_product(attenuation, ray_color(scattered, depth-1, world, head));
-            return color(0,0,0,0);
+                return hadamard_product(attenuation, ray_color(scattered, depth-1, world, head)) + color_from_emission;
+            return color_from_emission;
         }
 
         vec3h normal_dir = (r.direction().normal_of());
-        auto a = 0.5*(normal_dir.y + 1.0);
-        return (1.0-a)*color(1.0, 1.0, 1.0, 0) + a*color(0.5, 0.7, 1.0, 0);
+        return background;
     }
 
 public:
@@ -75,10 +75,9 @@ public:
     vec3h center;         // Camera center, point
     vec3h lookat;         // Any point the camera is looking toward
     vec3h pixel00_loc;    // Location of pixel 0, 0, point
-    vec3h   pixel_delta_u;  // Offset to pixel to the right, direction
-    vec3h   pixel_delta_v;  // Offset to pixel below, direction
-    //vec3h   defocus_disk_u;       // Defocus disk horizontal radius
-    //vec3h   defocus_disk_v;       // Defocus disk vertical radius
+    vec3h pixel_delta_u;  // Offset to pixel to the right, direction
+    vec3h pixel_delta_v;  // Offset to pixel below, direction
+    color background;
 
     camera():
         aspect_ratio(1.0), image_width(400), center(vec3h(0,0,0,1)), lookat(vec3h(0,0,-1,0)), fov(90),
