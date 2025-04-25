@@ -153,10 +153,10 @@ void test_shear() {
 
 void test_apply_total_transform() {
     const double A_data[4][4] = {
-        {2, 3, 4, 5},
-        {6, 1, 0, 3},
-        {0, 2, 3, 1},
-        {6, 4, 5, 1}
+        {2, 3, 4, 0},
+        {6, 1, 0, 0},
+        {0, 2, 3, 0},
+        {0, 0, 0, 1}
     };
     std::vector<vec3h> vertices = {
         vec3h(1, 0, 0, 1), vec3h(5, 3, 1, 1), vec3h(7, 1, 5, 1)
@@ -165,13 +165,14 @@ void test_apply_total_transform() {
 
     squareMatrix<4> A(A_data);
     triangleMesh mesh(vertices, indices, 2);
-    mesh.apply_total_transform(transform(A_data));
-
+    transform t1 = transform(A_data);
+    mesh.apply_total_transform(t1);
     assert(mesh.vertices[0] == vec3h(2,6,0,1));
-    assert(mesh.vertices[0] == vec3h(23,33,9,1));
-    assert(mesh.vertices[0] == vec3h(42,46,18,1));
+    assert(mesh.vertices[1] == vec3h(23,33,9,1));
+    assert(mesh.vertices[2] == vec3h(37,43,17,1));
 
     std::cout << "test_apply_total_transform passed!\n";
+    
 }
 
 int run_test_triangle() {
@@ -180,6 +181,7 @@ int run_test_triangle() {
     test_intersection();
     test_no_intersection();
     test_dist();
+    test_apply_total_transform();
     std::cout << "All tests passed!" << std::endl;
     return 0;
 }
