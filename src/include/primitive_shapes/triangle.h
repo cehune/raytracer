@@ -26,16 +26,19 @@ struct triangleMesh {
     std::vector<int> indices;     // Stores triangle vertex indices (3 per triangle)
     int num_triangles = 0;
     std::shared_ptr<bxdf> mat; // Shared material for all triangles
+    triangleMesh(std::shared_ptr<bxdf> mat) : mat(mat) {}
     triangleMesh(const std::vector<vec3h>& verts, const std::vector<int>& inds, int num_tri,  std::shared_ptr<bxdf> mat)
         : vertices(verts), indices(inds), num_triangles(num_tri), mat(mat) {}
     triangleMesh(const std::vector<vec3h>& verts, const std::vector<int>& inds, int num_tri)
         : vertices(verts), indices(inds), num_triangles(num_tri), mat(std::make_shared<diffuseBXDF>(color(0.5, 0.5, 0.5, 0))) {}
-    void apply_total_transform(transform& t) {
-        for (int i = 0; i < vertices.size(); i++) {
-            vertices[i] = apply_transform(t.m, vertices[i]);
-        }
-    }
+    void apply_total_transform(transform& t);
 };
+
+void triangleMesh::apply_total_transform(transform& t) {
+    for (int i = 0; i < vertices.size(); i++) {
+        vertices[i] = apply_transform(t.m, vertices[i]);
+    }
+}
 
 class triangle : public hittable {
 private:
