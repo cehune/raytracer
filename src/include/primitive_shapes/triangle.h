@@ -25,6 +25,7 @@ struct triangleMesh {
     std::vector<vec3h> vertices;  // Stores unique vertex positions
     std::vector<int> indices;     // Stores triangle vertex indices (3 per triangle)
     int num_triangles = 0;
+    Bounds3f total_bound;
     std::shared_ptr<bxdf> mat; // Shared material for all triangles
     triangleMesh(std::shared_ptr<bxdf> mat) : mat(mat) {}
     triangleMesh(const std::vector<vec3h>& verts, const std::vector<int>& inds, int num_tri,  std::shared_ptr<bxdf> mat)
@@ -32,6 +33,8 @@ struct triangleMesh {
     triangleMesh(const std::vector<vec3h>& verts, const std::vector<int>& inds, int num_tri)
         : vertices(verts), indices(inds), num_triangles(num_tri), mat(std::make_shared<diffuseBXDF>(color(0.5, 0.5, 0.5, 0))) {}
     void apply_total_transform(transform& t);
+    Bounds3f bounds();
+
 };
 
 void triangleMesh::apply_total_transform(transform& t) {
@@ -39,6 +42,7 @@ void triangleMesh::apply_total_transform(transform& t) {
         vertices[i] = apply_transform(t.m, vertices[i]);
     }
 }
+
 
 class triangle : public hittable {
 private:
@@ -237,6 +241,16 @@ Bounds3f triangle::bounds() const  {
     Bounds3f b = Bounds3f(p0, p1);
     b.expand(p2);
     return b;
+}
+
+Bounds3f triangleMesh::bounds() {
+    Bounds3f full_bounds;
+    for (int i = 0; i < num_triangles; i++) {
+        triangle curr = triangle(this, i);
+        full_bounds = Union(full_bounds, curr.bounds());
+    }
+    total_bound = full_bounds;
+    return full_bounds;
 }
 
 #endif

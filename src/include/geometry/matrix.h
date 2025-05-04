@@ -47,12 +47,13 @@ public:
         }
     }
 
-    squareMatrix operator=(squareMatrix& m) {
+    squareMatrix operator=(const squareMatrix& m) {
         for (int i = 0; i < N; ++i) {
             for (int j = 0; j < N; ++j) {
                 matrix[i][j] = m.matrix[i][j];
             }
         }
+        return *this;
     }
 
     squareMatrix operator+(squareMatrix& m) {

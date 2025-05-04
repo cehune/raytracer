@@ -130,13 +130,6 @@ Bounds3f Union(const Bounds3f &b, vec3h& p) {
     Bounds3f ret;
     ret.pmin = vec_min(b.pmin, p);
     ret.pmax = vec_max(b.pmax, p);
-    ret.pmin.x *= 2.0;
-
-    ret.pmin.y *= 2.0;
-    ret.pmin.z *= 2.0;
-    ret.pmax.x *= 2.0;
-    ret.pmax.y *= 2.0;
-    ret.pmax.z *= 2.0;
     return ret;
 }
 

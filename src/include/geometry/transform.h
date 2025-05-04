@@ -11,8 +11,13 @@ class transform {
 public:
     transform();
     transform(const squareMatrix<4>& m) : m(m) {}
+    transform& operator=(const transform& t1) {
+        if (this != &t1) {
+            m = t1.m;
+        }
+        return *this;
+    }
     squareMatrix<4> m;
-
 };
 
 vec3h apply_transform(squareMatrix<4> &transform, vec3h u) {
@@ -21,6 +26,14 @@ vec3h apply_transform(squareMatrix<4> &transform, vec3h u) {
 
 transform combine_transform(transform &t1, transform &t2) {
     return transform(t1.m * t2.m);
+}
+
+transform combine_transform(transform &t1, transform &t2, transform &t3) {
+    return transform(t1.m * t2.m * t3.m);
+}
+
+transform combine_transform(transform &t1, transform &t2, transform &t3, transform &t4) {
+    return transform(t1.m * t2.m * t3.m * t4.m);
 }
 
 transform translate(vec3h delta) {
