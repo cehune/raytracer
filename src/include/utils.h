@@ -33,13 +33,10 @@ inline double random_double(double min, double max) {
     return min + (max-min)*random_double();
 }
 
-// Common Headers
-#include "color.h"
-#include "ray.h"
-#include "geometry/vec3.h"
-#include "interval.h"
-#include "materials/diffuseBXDF.h"
-#include "materials/specularBXDF.h"
-#include "materials/refractiveBXDF.h"
+inline double clamp(double x, double min_val, double max_val) {
+    if (x < min_val) return min_val;
+    if (x > max_val) return max_val;
+    return x;
+}
 
 #endif

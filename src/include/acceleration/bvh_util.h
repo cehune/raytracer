@@ -1,19 +1,22 @@
+// bvh_util.h
 #ifndef BVH_UTIL_H
 #define BVH_UTIL_H
 
 #include <iostream>
 #include <vector>
+#include <memory>
 #include "../geometry/bounds.h"
+#include "../primitive_shapes/hittable.h"
 
 struct BVHPrimitive {
-    BVHPrimitive() {}
-    BVHPrimitive(size_t primitiveIndex, const Bounds3f &bounds, shared_ptr<hittable> obj)
-        : primitiveIndex(primitiveIndex), bounds(bounds), object(obj) {}
+    BVHPrimitive();
+    BVHPrimitive(size_t primitiveIndex, const Bounds3f &bounds, std::shared_ptr<hittable> obj);
+
     size_t primitiveIndex;
     Bounds3f bounds;
-    shared_ptr<hittable> object;
-    // BVHPrimitive Public Methods
-    vec3h Centroid() const { return .5f * bounds.pmin + .5f * bounds.pmax; }
+    std::shared_ptr<hittable> object;
+
+    vec3h Centroid() const;
 };
 
 struct BVHBucket {
@@ -27,34 +30,14 @@ struct BVHTreeNode {
     Bounds3f bounds;
     std::vector<BVHPrimitive> prims;
 
-    // Move constructor
-    BVHTreeNode(BVHTreeNode&& other) noexcept
-        : left(std::move(other.left)),
-          right(std::move(other.right)),
-          bounds(std::move(other.bounds)),
-          prims(std::move(other.prims)) {}
+    BVHTreeNode();
+    BVHTreeNode(BVHTreeNode&& other) noexcept;
+    BVHTreeNode& operator=(BVHTreeNode&& other) noexcept;
 
-    // Move assignment operator
-    BVHTreeNode& operator=(BVHTreeNode&& other) noexcept {
-        if (this != &other) {
-            left = std::move(other.left);
-            right = std::move(other.right);
-            bounds = std::move(other.bounds);
-            prims = std::move(other.prims);
-        }
-        return *this;
-    }
-
-    // Delete copy constructor and copy assignment operator (if not already deleted)
-    BVHTreeNode() = default;
     BVHTreeNode(const BVHTreeNode&) = delete;
     BVHTreeNode& operator=(const BVHTreeNode&) = delete;
 
-    // Check if the node is a leaf node
-    bool isLeaf() const {
-        return left == nullptr && right == nullptr;
-    }
+    bool isLeaf() const;
 };
 
-
-#endif
+#endif // BVH_UTIL_H
