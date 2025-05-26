@@ -1,5 +1,5 @@
 #include "../include/geometry/vec3.h"
-#include "../include/materials/diffuseBXDF.h"
+#include "../include/bxdf/diffuseBXDF.h"
 #include "../include/primitive_shapes/triangle.h"
 #include <cassert>
 #include <vector>
